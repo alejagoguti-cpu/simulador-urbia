@@ -1,0 +1,11 @@
+import { createRequire } from 'module'; const puppeteer = createRequire('C:/Users/aleja/Documents/BACO-OBRA/package.json')('puppeteer-core');
+const [out, k = 'p1', modo = 'ninos', w = '1600', h = '900'] = process.argv.slice(2);
+const b = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: 'new', protocolTimeout: 170000, args: ['--use-angle=d3d11', '--ignore-gpu-blocklist'] });
+const p = await b.newPage(); await p.setViewport({ width: +w, height: +h }); const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (/seis|simulaciones|Error/i.test(m.text())) errs.push(m.text()); });
+await p.evaluateOnNewDocument((m) => { try { localStorage.setItem('ss-modo', m); localStorage.setItem('ken-guia-v1', '1'); } catch (e) {} }, modo);
+await p.goto('http://localhost:4377/index.html', { waitUntil: 'domcontentloaded', timeout: 60000 }); await new Promise(r => setTimeout(r, 30000));
+await p.evaluate(() => { const s = [...document.querySelectorAll('button')].find(b => /Saltar/.test(b.textContent)); if (s) s.click(); });
+await p.evaluate((k) => { const b = document.querySelector(`#ss-bar button[data-k="${k}"]`); if (b) b.click(); }, k);
+await new Promise(r => setTimeout(r, 9000));
+const fps = await p.evaluate(() => new Promise(r => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 2000) requestAnimationFrame(f); else r(n / 2); }; requestAnimationFrame(f); }));
+await p.screenshot({ path: out }); console.log('fps', fps, 'errors:', errs.slice(0, 6).join(' | ') || 'none'); await b.close();
