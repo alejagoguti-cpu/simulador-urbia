@@ -4,7 +4,7 @@ const b = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chro
 const p = await b.newPage(); await p.setViewport({ width: 1600, height: 900 }); const errs = []; p.on('pageerror', e => errs.push(e.message));
 await p.evaluateOnNewDocument(() => { localStorage.setItem('ken-guia-v1', '1'); localStorage.setItem('ss-modo', 'ninos'); });
 await p.goto('http://localhost:4377/index.html', { waitUntil: 'domcontentloaded', timeout: 60000 }); await new Promise(r => setTimeout(r, 35000));
-await p.evaluate((k, v) => { const b = document.querySelector(`#ss-bar button[data-k="${k}"][data-v="${v}"]`); if (b) b.click(); }, k, v);
+await p.evaluate((k, v) => { window.KEN_SEIS.then(S => S.abrir(k, v)); }, k, v);
 await new Promise(r => setTimeout(r, 10000));
 console.log(await p.evaluate(async () => { const S = await window.KEN_SEIS; const g = document.querySelector('#ss-lbl').children.length; return JSON.stringify({ k: S && S.ST.k, ver: S && S.ST.ver, labels: g }); }));
 await p.screenshot({ path: out }); console.log('errors:', errs.slice(0, 5).join(' | ') || 'none'); await b.close();

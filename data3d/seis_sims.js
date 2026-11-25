@@ -9,7 +9,7 @@ const W = (lat, lng) => [2095.67 + (lng + 74.149576) * 110960, -109.06 - (lat - 
 const LUG = {
   cora: [1130, 950], burro: [2095.67, -109.06], vaca: W(4.628701, -74.161978), techo: W(4.645179, -74.141652), bav: [4136, 96],
   patio: W(4.6335, -74.1755), tintal: W(4.6455, -74.1600), timiza: W(4.610461, -74.156535), carvajal: W(4.6115, -74.1395),
-  central: W(4.623167, -74.154738), alcaldia: W(4.6268, -74.1517), americas: W(4.619142, -74.135191)
+  central: W(4.623167, -74.154738), pt: W(4.6395, -74.1678), alcaldia: W(4.6268, -74.1517), americas: W(4.619142, -74.135191)
 };
 /* ---------------- íconos planos (SVG, sin emojis) ---------------- */
 const I = {
@@ -34,7 +34,7 @@ const rampa = (t, sem) => Math.min(1, t / sem);
 const POB = 1037929;
 const NEED = POB * 347.1 / 365 / 1000; // t/día de alimentos que necesita Kennedy (SDDE 2025: 347,1 kg/hab/año)
 const SIMS = [
-  { k: 'p1', n: 'Abastecimiento', largo: 'Abastecimiento y producción distribuida', ic: 'camion', lugar: 'cora', dist: 650,
+  { k: 'p1', n: 'Abastecimiento', largo: 'Abastecimiento y producción distribuida', ic: 'camion', lugar: 'cora', dist: 650, distB: 2300,
     nino: 'Todos los días llegan camiones con comida a Corabastos. ¿Qué pasa si se bloquea la vía? ¿Y si los barrios cultivan y tienen mercados cerca?',
     escala: '1 camión 3D = 5 camiones reales',
     par: { dem: 1, merc: 12, bloqDur: 6 },
@@ -85,7 +85,7 @@ const SIMS = [
       ['Ruido junto a la vía', fmt(a.dB, 1) + ' dB', fmt(b.dB, 1) + ' dB', 'Norma residencial 65 dB (Res. 627/2006)', 'p2']],
     nino3: (a, b, e) => [['auto', fmt(e.V), 'carros por hora'], ['reinicio', fmt(e.v, 0) + ' km/h', 'velocidad'], ['ruido', fmt(e.dB, 0) + ' dB', 'de ruido']],
     bueno: e => e.dB <= 72.5 && e.v >= 12 },
-  { k: 'p3', n: 'Residuos', largo: 'Residuos y circularidad', ic: 'residuo', lugar: 'central', dist: 900,
+  { k: 'p3', n: 'Residuos', largo: 'Residuos y circularidad', ic: 'residuo', lugar: 'central', dist: 1000, distB: 1600,
     nino: 'Kennedy bota mucha basura cada día. La mitad es comida y cáscaras. Si se separa, las Estaciones Circulares la vuelven abono para las huertas.',
     escala: '1 camión 3D = 4 camiones compactadores reales',
     par: { gen: 1, est: 10, sep: 40 },
@@ -115,7 +115,7 @@ const SIMS = [
       ['Basura acumulada sin recoger', fmt(a.acum) + ' t', fmt(b.acum) + ' t', 'Game Over si supera 2 días de generación', 'p3']],
     nino3: (a, b, e) => [['residuo', fmt(e.cam), 'camiones al relleno'], ['hoja', fmt(e.comp, 0) + ' t', 'de abono al día'], ['alerta', fmt(e.acum) + ' t', 'basura acumulada']],
     bueno: e => e.acum < 2 * POB * 1.1 / 1000 },
-  { k: 'p4', n: 'Biodiversidad', largo: 'Biodiversidad y conectividad ecológica', ic: 'ave', lugar: 'burro', dist: 800,
+  { k: 'p4', n: 'Biodiversidad', largo: 'Biodiversidad y conectividad ecológica', ic: 'ave', lugar: 'burro', dist: 900, distB: 1700,
     nino: 'En el humedal El Burro viven 49 especies de aves. Si se daña el humedal, se van. Con jardines y corredores verdes pueden moverse entre humedales.',
     escala: '1 ave 3D = 1 especie que sigue presente',
     par: { dano: 40, corr: 6 },
@@ -140,7 +140,7 @@ const SIMS = [
       ['Cambio frente a hoy', fmt((a.S / 49 - 1) * 100) + ' %', fmt((b.S / 49 - 1) * 100) + ' %', 'Game Over: −30 % o más', 'p4']],
     nino3: (a, b, e) => [['ave', fmt(e.S), 'especies de aves'], ['hoja', fmt(e.area, 0) + ' ha', 'de hábitat'], ['alerta', fmt((e.S / 49 - 1) * 100) + '%', 'frente a hoy']],
     bueno: e => e.S > 49 * 0.7 },
-  { k: 'p5', n: 'Población', largo: 'Población y presiones sobre el suelo', ic: 'casa', lugar: 'patio', dist: 1700,
+  { k: 'p5', n: 'Población', largo: 'Población y presiones sobre el suelo', ic: 'casa', lugar: 'pt', dist: 2600,
     nino: 'En Patio Bonito vive muchísima gente junta. En Tintal Norte hay más espacio. Si llega más gente, ¿alcanzan los parques y los colegios?',
     escala: '1 piso de la torre = 10.000 habitantes',
     par: { crece: 0.4, eq: 6, prot: 20 },
@@ -204,16 +204,29 @@ const SECTORES = [
   { k: 'central', n: 'Kennedy Central', org: 67, p: LUG.central }, { k: 'carvajal', n: 'Carvajal', org: 25, p: LUG.carvajal }, { k: 'americas', n: 'Américas', org: 20, p: LUG.americas }
 ];
 
+/* ---------- anillos de % (lo que se lee primero, en los dos modos) ---------- */
+const RINGS = {
+  p1: (e, P) => [['Comida que llega', e.pct, fmt(e.pct * 100) + '%'], ['Hogares con mercado cerca', e.cob, fmt(e.cob * 100) + '%'], ['Camiones a Corabastos', Math.min(1, e.tru / 1800), fmt(e.tru)]],
+  p2: (e, P) => [['Velocidad', Math.min(1, e.v / 40), fmt(e.v, 0) + ' km/h'], ['Ruido', cl((e.dB - 55) / 25, 0, 1), fmt(e.dB, 0) + ' dB', true], ['Carros por hora', Math.min(1, e.V / 6000), fmt(e.V)]],
+  p3: (e, P) => [['Orgánicos aprovechados', e.org ? e.proc / e.org : 0, fmt(e.org ? e.proc / e.org * 100 : 0) + '%'], ['Basura al relleno', e.tot ? e.dj / e.tot : 0, fmt(e.tot ? e.dj / e.tot * 100 : 0) + '%', true], ['Basura acumulada', Math.min(1, e.acum / (2 * POB * 1.1 / 1000)), fmt(e.acum) + ' t', true]],
+  p4: (e, P) => [['Especies frente a hoy', Math.min(1, e.S / 49), fmt(e.S)], ['Hábitat (ha)', Math.min(1, e.area / 60), fmt(e.area, 0) + ' ha'], ['Conectividad', e.conect, fmt(e.conect * 100) + '%']],
+  p5: (e, P) => [['Parque por persona', Math.min(1, e.parque / 4), fmt(e.parque, 1) + ' m²'], ['Niños sin cupo', 1 - Math.min(1, e.deficit / 11300), fmt(e.deficit)], ['Densidad Patio Bonito', Math.min(1, e.pb / 317 / 600), fmt(e.pb / 317) + '/ha', true]],
+  p6: (e, P) => [['Necesidades atendidas', e.aten, fmt(e.aten * 100) + '%'], ['Barrios con ayuda', 1 - e.sin / 6, fmt(6 - e.sin) + ' de 6'], ['Decide la comunidad', P.partic / 100, fmt(P.partic) + '%']]
+};
+const anillo = (v, malo) => { const r = 26, c = 2 * Math.PI * r, f = cl(v || 0, 0, 1), col = malo ? (f > 0.66 ? '#ff6b5e' : f > 0.4 ? '#f2b84b' : '#D5FF3F') : (f < 0.5 ? '#ff6b5e' : f < 0.8 ? '#f2b84b' : '#D5FF3F');
+  return `<svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="${r}" fill="none" stroke="rgba(244,243,239,.1)" stroke-width="6"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c * f} ${c}" transform="rotate(-90 32 32)"/></svg>`; };
+
 export async function iniciarSeisSims({ getT3 }) {
   const espera = () => new Promise(r => { const f = () => { const T = getT3(); T && T.net && T.lw && T.camera && T.orbit ? r(T) : setTimeout(f, 500); }; f(); });
   const T3 = await espera(), THREE = T3.THREE;
+  const PJ = await fetch('data3d/propuesta.json?v=1').then(r => r.json()).catch(() => null);
   const Y = () => (T3.viaY != null ? T3.viaY : 0.62) + 0.4;
-  /* ---------- grafo de vías reales (net.json) ---------- */
+  /* ---------- grafo de vías reales (net.json); nodos unidos a 12 m (a 4 m la red queda partida) ---------- */
   const G = (() => {
     const key = new Map(), X = [], Z = [], adj = [];
     const nodo = (x, z) => { const k = Math.round(x / 12) + ',' + Math.round(z / 12); let i = key.get(k); if (i === undefined) { i = X.length; key.set(k, i); X.push(x); Z.push(z); adj.push([]); } return i; };
     for (const [cls, pts0] of T3.net.edges) {
-      if (!pts0 || pts0.length < 2 || cls === 'path' || cls === 'foot') continue;
+      if (!pts0 || pts0.length < 2) continue;
       const pts = pts0.map(p => T3.lw(p[0], p[1])); let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
       const a = nodo(pts[0][0], pts[0][1]), b = nodo(pts[pts.length - 1][0], pts[pts.length - 1][1]); if (a === b) continue;
       const e = { a, b, L: L * (cls === 'major' ? 0.6 : cls === 'mid' ? 0.85 : 1), pts, cls }; adj[a].push(e); adj[b].push(e);
@@ -233,233 +246,248 @@ export async function iniciarSeisSims({ getT3 }) {
     return { X, Z, idx, mayores, cercano, arbol, ruta };
   })();
   const conCum = (pts) => { const cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); return { pts, cum, L: cum[cum.length - 1] }; };
-  const enRuta = (r, s) => { let i = 1; while (i < r.cum.length - 1 && r.cum[i] < s) i++; const a = r.pts[i - 1], b = r.pts[i], f = (s - r.cum[i - 1]) / ((r.cum[i] - r.cum[i - 1]) || 1); return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, Math.atan2(b[0] - a[0], b[1] - a[1])]; };
-  // rutas hacia un destino desde nodos mayores a cierta distancia (entradas)
+  const enRuta = (r, s) => { let lo = 1, hi = r.cum.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (r.cum[m] < s) lo = m + 1; else hi = m; } const i = lo, a = r.pts[i - 1], b = r.pts[i], f = (s - r.cum[i - 1]) / ((r.cum[i] - r.cum[i - 1]) || 1); return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, Math.atan2(b[0] - a[0], b[1] - a[1])]; };
   const rutasHacia = (dest, rMin, rMax, n, lista = G.mayores) => { const d = G.cercano(dest[0], dest[1]), t = G.arbol(d), cand = lista.filter(i => { const q = Math.hypot(G.X[i] - dest[0], G.Z[i] - dest[1]); return q > rMin && q < rMax; });
-    const out = []; for (let k = 0; k < cand.length && out.length < n; k += Math.max(1, Math.floor(cand.length / n))) { const r = G.ruta(t, cand[k]); if (r && r.length > 3) out.push(conCum(r.slice().reverse())); } return out; };
+    const out = []; for (let k = 0; k < cand.length && out.length < n; k += Math.max(1, Math.floor(cand.length / n))) { const r = G.ruta(t, cand[k]); if (r && r.length > 3) out.push(conCum(r.slice().reverse())); } return out.length ? out : [conCum([[dest[0] - 300, dest[1]], [dest[0], dest[1]]])]; };
 
-  /* ---------- modelos 3D (geometrías propias, instanciadas) ---------- */
-  const mat = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.55, metalness: 0.1, ...o });
-  function flota(partes, max) { // partes: [[geom, material]] -> conjunto instanciado que comparte matrices
-    const g = new THREE.Group(); const ms = partes.map(([geo, m]) => { const im = new THREE.InstancedMesh(geo, m, max); im.count = 0; im.frustumCulled = false; im.castShadow = true; g.add(im); return im; });
+  /* ---------- materiales y piezas: todo va en la lista transparente (renderOrder alto) para quedar ENCIMA del velo que apaga la ciudad ---------- */
+  const RO = 40;
+  const mat = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.45, metalness: 0.1, transparent: true, opacity: 1, ...o });
+  const brillo = (c, op = 0.55) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: op, depthWrite: false, toneMapped: false, side: THREE.DoubleSide });
+  const borde = (c) => new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: 0.95, toneMapped: false });
+  function flota(partes, max) {
+    const g = new THREE.Group(); const ms = partes.map(([geo, m]) => { const im = new THREE.InstancedMesh(geo, m, max); im.count = 0; im.frustumCulled = false; im.renderOrder = RO + 2; g.add(im); return im; });
     const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(), P = new THREE.Vector3(), E = new THREE.Euler();
-    return { g, max, poner(i, x, y, z, ang, esc = 1) { P.set(x, y, z); E.set(0, ang, 0); Q.setFromEuler(E); S.set(esc, esc, esc); M.compose(P, Q, S); for (const im of ms) im.setMatrixAt(i, M); },
+    return { g, max, poner(i, x, y, z, ang, esc = 1, sy = esc) { P.set(x, y, z); E.set(0, ang, 0); Q.setFromEuler(E); S.set(esc, sy, esc); M.compose(P, Q, S); for (const im of ms) im.setMatrixAt(i, M); },
       fin(n) { for (const im of ms) { im.count = n; im.instanceMatrix.needsUpdate = true; } } };
   }
   const caja = (w, h, l, y = 0, z = 0) => new THREE.BoxGeometry(w, h, l).translate(0, y + h / 2, z);
-  const rueda = (z) => { const g = new THREE.CylinderGeometry(0.55, 0.55, 2.5, 12).rotateZ(Math.PI / 2).translate(0, 0.55, z); return g; };
-  const ruedas = (zs) => { const gs = zs.map(rueda); const pos = []; let off = 0; const idx = []; for (const g of gs) { const p = g.attributes.position.array, ix = g.index.array; for (const v of p) pos.push(v); for (const v of ix) idx.push(v + off); off += p.length / 3; } const r = new THREE.BufferGeometry(); r.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); r.setIndex(idx); r.computeVertexNormals(); return r; };
-  const mNegro = mat('#1d1f1c', { roughness: 0.9 }), mVidrio = mat('#20303a', { metalness: 0.6, roughness: 0.2 });
-  // camión de carga (furgón blanco, cabina roja) ~ 9 m
-  const camion = (cab, caja_) => [[caja(2.4, 2.3, 2.2, 0.8, 3.2), mat(cab)], [caja(2.3, 0.8, 0.12, 2.0, 4.31), mVidrio], [caja(2.5, 3.0, 6.0, 0.9, -1.1), mat(caja_)], [ruedas([3.2, -0.6, -2.8]), mNegro]];
-  const furgon = (c) => [[caja(2.0, 1.4, 2.0, 0.6, 1.8), mat(c)], [caja(2.0, 2.1, 3.4, 0.6, -0.9), mat('#f1f2ec')], [ruedas([1.8, -1.6]), mNegro]];
-  const carro = () => [[caja(1.8, 0.75, 4.3, 0.35), mat('#c9ccd1', { metalness: 0.5, roughness: 0.35 })], [caja(1.6, 0.6, 2.2, 1.1, -0.2), mVidrio], [ruedas([1.3, -1.3]), mNegro]];
-  const compactador = () => [[caja(2.4, 2.2, 2.2, 0.8, 3.2), mat('#e9ece6')], [caja(2.5, 3.1, 6.0, 0.9, -1.1), mat('#2f7d4f')], [caja(2.52, 0.4, 6.02, 2.6, -1.1), mat('#e9ece6')], [ruedas([3.2, -0.6, -2.8]), mNegro]];
-
-  /* ---------- escenas por simulación ---------- */
-  const grupo = new THREE.Group(); grupo.name = 'seis_sims'; grupo.visible = false; T3.scene.add(grupo);
-  const ESC = {}; // k -> { g, actualizar(estado, dt), etiquetas: [{p:[x,z], h, html()}] }
-  const ESCALA_VIS = 3.2; // los agentes se dibujan ×3,2 para que se lean desde la vista de barrio
-  function agentes(rutas, flotaObj, vel) { // agentes que recorren rutas en bucle
-    const A = []; return { A, ajustar(n) { while (A.length < Math.min(n, flotaObj.max)) { const r = rutas[A.length % rutas.length]; A.push({ r, s: Math.random() * r.L, v: vel * (0.8 + Math.random() * 0.4) }); } A.length = Math.min(A.length, n); },
-      mover(dt, kV = 1) { const y = Y(); A.forEach((a, i) => { a.s += a.v * kV * dt; if (a.s > a.r.L) a.s = 0; const [x, z, ang] = enRuta(a.r, a.s); flotaObj.poner(i, x, y, z, ang, ESCALA_VIS); }); flotaObj.fin(A.length); } };
+  const ruedas = (zs) => { const pos = [], idx = []; let off = 0; for (const z of zs) { const g = new THREE.CylinderGeometry(0.55, 0.55, 2.5, 10).rotateZ(Math.PI / 2).translate(0, 0.55, z); for (const v of g.attributes.position.array) pos.push(v); for (const v of g.index.array) idx.push(v + off); off += g.attributes.position.count; } const r = new THREE.BufferGeometry(); r.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); r.setIndex(idx); r.computeVertexNormals(); return r; };
+  const mNegro = mat('#15171a', { roughness: 0.9 }), mVidrio = mat('#7fb7d6', { emissive: '#1d3c4c', metalness: 0.5, roughness: 0.15 });
+  const camion = (cab, cj) => [[caja(2.4, 2.3, 2.2, 0.8, 3.2), mat(cab, { emissive: cab, emissiveIntensity: 0.35 })], [caja(2.3, 0.8, 0.12, 2.0, 4.31), mVidrio], [caja(2.5, 3.0, 6.0, 0.9, -1.1), mat(cj, { emissive: cj, emissiveIntensity: 0.25 })], [ruedas([3.2, -0.6, -2.8]), mNegro]];
+  const furgon = (c) => [[caja(2.0, 1.4, 2.0, 0.6, 1.8), mat(c, { emissive: c, emissiveIntensity: 0.5 })], [caja(2.0, 2.1, 3.4, 0.6, -0.9), mat('#f6f7f1', { emissive: '#3a3d33' })], [ruedas([1.8, -1.6]), mNegro]];
+  const carro = () => [[caja(1.8, 0.75, 4.3, 0.35), mat('#ffffff', { emissive: '#666a70', metalness: 0.4 })], [caja(1.6, 0.6, 2.2, 1.1, -0.2), mVidrio], [ruedas([1.3, -1.3]), mNegro]];
+  const compactador = () => [[caja(2.4, 2.2, 2.2, 0.8, 3.2), mat('#f2f3ee', { emissive: '#40433a' })], [caja(2.5, 3.1, 6.0, 0.9, -1.1), mat('#3fb36b', { emissive: '#1f6b3c' })], [ruedas([3.2, -0.6, -2.8]), mNegro]];
+  // volumen extruido de un polígono (mundo x,z) con contorno brillante: así se resaltan predios y zonas como en la lámina de referencia
+  function volumen(poly, h, color, op = 0.42) {
+    const sh = new THREE.Shape(poly.map(p => new THREE.Vector2(p[0], -p[1])));
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2);
+    const g = new THREE.Group(); const m = new THREE.Mesh(geo, brillo(color, op)); m.renderOrder = RO; g.add(m);
+    const ed = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30), borde(color)); ed.renderOrder = RO + 1; g.add(ed); g.position.y = Y(); return g;
   }
-  function anilloMesh(r0, r1, c, op = 0.6) { const m = new THREE.Mesh(new THREE.RingGeometry(r0, r1, 96).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide, toneMapped: false })); m.renderOrder = 8; return m; }
+  const circulo = (c, r, n = 40) => Array.from({ length: n }, (_, i) => [c[0] + Math.cos(i / n * 6.283) * r, c[1] + Math.sin(i / n * 6.283) * r]);
+  const rect = (c, w, l, a = 0) => [[-w / 2, -l / 2], [w / 2, -l / 2], [w / 2, l / 2], [-w / 2, l / 2]].map(([x, z]) => [c[0] + x * Math.cos(a) - z * Math.sin(a), c[1] + x * Math.sin(a) + z * Math.cos(a)]);
+  const disco = (c, r, color, op = 0.22) => { const m = new THREE.Mesh(new THREE.CircleGeometry(r, 64).rotateX(-Math.PI / 2), brillo(color, op)); m.position.set(c[0], Y() + 0.8, c[1]); m.renderOrder = RO; const a = new THREE.Mesh(new THREE.RingGeometry(r - 4, r, 96).rotateX(-Math.PI / 2), brillo(color, 0.9)); a.position.copy(m.position); a.renderOrder = RO + 1; const g = new THREE.Group(); g.add(m, a); return g; };
+  function cinta(pts, ancho, color) { const P = [], I = []; for (let k = 0; k < pts.length; k++) { const a = pts[Math.max(0, k - 1)], b = pts[Math.min(pts.length - 1, k + 1)]; let dx = b[0] - a[0], dz = b[1] - a[1]; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l; P.push(pts[k][0] - dz * ancho / 2, Y() + 4, pts[k][1] + dx * ancho / 2, pts[k][0] + dz * ancho / 2, Y() + 4, pts[k][1] - dx * ancho / 2); if (k < pts.length - 1) { const v = k * 2; I.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); } }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setIndex(I); const mt = brillo(color, 0.85); mt.depthTest = false; const m = new THREE.Mesh(g, mt); m.renderOrder = RO + 1; return m; }
+
+  /* ---------- velo: apaga la ciudad para que la simulación resalte (como la lámina de referencia) ---------- */
+  const velo = new THREE.Mesh(new THREE.PlaneGeometry(60000, 60000).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#04070a', transparent: true, opacity: 0.5, depthTest: false, depthWrite: false, toneMapped: false }));
+  velo.renderOrder = RO - 5; velo.position.y = 300; velo.frustumCulled = false;
+  const grupo = new THREE.Group(); grupo.name = 'seis_sims'; grupo.visible = false; grupo.add(velo); T3.scene.add(grupo);
+  const ESC = {}, ESCALA_VIS = 6; // agentes ×6: se leen desde la vista de barrio (maqueta)
+  function agentes(rutas, fl, vel, esc = ESCALA_VIS) {
+    const A = []; return { A, ajustar(n) { n = Math.min(n, fl.max); while (A.length < n) { const r = rutas[A.length % rutas.length]; A.push({ r, s: Math.random() * r.L, v: vel * (0.8 + Math.random() * 0.4) }); } A.length = n; },
+      mover(dt, kV = 1) { const y = Y(); for (let i = 0; i < A.length; i++) { const a = A[i]; a.s += a.v * kV * dt; if (a.s > a.r.L) a.s = 0; const [x, z, ang] = enRuta(a.r, a.s); fl.poner(i, x, y, z, ang, esc); } fl.fin(A.length); } };
+  }
   function construir(k) {
     if (ESC[k]) return ESC[k]; const g = new THREE.Group(); grupo.add(g); const E = { g, etiquetas: [] };
     if (k === 'p1') {
-      const fC = flota(camion('#b6382f', '#f3f3ee'), 260), fV = flota(furgon('#D5FF3F'), 120); g.add(fC.g, fV.g);
-      const rC = rutasHacia(LUG.cora, 1800, 5200, 24); const aC = agentes(rC.length ? rC : [conCum([[0, 0], [1, 1]])], fC, 9);
-      // mercados de barrio: nodos repartidos (punto más lejano) a 1,5–3,5 km de Corabastos
-      const cand = G.idx.filter((i, j) => j % 7 === 0 && Math.hypot(G.X[i] - LUG.cora[0], G.Z[i] - LUG.cora[1]) > 900 && Math.hypot(G.X[i] - LUG.burro[0], G.Z[i] - LUG.burro[1]) < 3200);
+      const polyC = PJ && PJ.corabastos ? PJ.corabastos : circulo(LUG.cora, 330);
+      const vC = volumen(polyC, 12, '#ff8a5b', 0.2); g.add(vC);
+      const fC = flota(camion('#e0412f', '#f7f7f2'), 300), fV = flota(furgon('#D5FF3F'), 140); g.add(fC.g, fV.g);
+      const aC = agentes(rutasHacia(LUG.cora, 900, 4200, 30), fC, 14);
+      const cand = G.idx.filter((i, j) => j % 5 === 0 && Math.hypot(G.X[i] - LUG.cora[0], G.Z[i] - LUG.cora[1]) > 700 && Math.hypot(G.X[i] - LUG.cora[0], G.Z[i] - LUG.cora[1]) < 2600);
       const MERC = []; if (cand.length) { MERC.push(cand[0]); while (MERC.length < 20) { let m = null, md = -1; for (const p of cand) { const d = Math.min(...MERC.map(q => Math.hypot(G.X[q] - G.X[p], G.Z[q] - G.Z[p]))); if (d > md) { md = d; m = p; } } MERC.push(m); } }
-      const marc = MERC.map(i => { const m = anilloMesh(14, 26, '#D5FF3F', 0.9); m.position.set(G.X[i], Y() + 0.6, G.Z[i]); m.visible = false; g.add(m); const pin = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 24, 16).translate(0, 12, 0), mat('#D5FF3F', { emissive: '#3d4a10' })); pin.position.copy(m.position); pin.visible = false; g.add(pin); return { m, pin }; });
-      const rV = MERC.slice(0, 20).map(i => { const rs = rutasHacia([G.X[i], G.Z[i]], 1500, 4000, 1); return rs[0]; }).filter(Boolean); const aV = agentes(rV.length ? rV : [conCum([[0, 0], [1, 1]])], fV, 11);
-      const aro = anilloMesh(360, 380, '#e15759', 0.7); aro.position.set(LUG.cora[0], Y() + 0.5, LUG.cora[1]); g.add(aro);
-      E.etiquetas.push({ p: LUG.cora, h: 60, html: (e) => `${ico('camion', 18)}<b>Corabastos</b><span>${fmt(e.tru)} camiones/día · ${fmt(e.tru * 4.64)} t</span>` });
-      E.actualizar = (e, P, B, dt, X) => { aC.ajustar(Math.round(e.tru / 5)); aC.mover(dt, X.pertOn && e.tru < 1000 ? 0.15 : 1); const nM = B ? P.merc : 0; marc.forEach((q, i) => { q.m.visible = q.pin.visible = i < nM; });
-        aV.ajustar(B ? Math.round(e.reg * NEED * P.dem / 4.64 / 2) : 0); aV.mover(dt); aro.material.color.set(e.pct < 0.8 ? '#e15759' : '#D5FF3F'); };
+      const mercs = MERC.map(i => { const c = [G.X[i], G.Z[i]], gg = new THREE.Group(); gg.add(volumen(rect(c, 60, 40), 22, '#D5FF3F', 0.6)); gg.add(disco(c, 300, '#D5FF3F', 0.07));
+        for (let h = 0; h < 6; h++) { const a = h * 1.05, hc = [c[0] + Math.cos(a) * 110, c[1] + Math.sin(a) * 110]; gg.add(volumen(rect(hc, 34, 22, a), 3, '#59c25a', 0.7)); } gg.visible = false; g.add(gg); return gg; });
+      const rV = MERC.map(i => rutasHacia([G.X[i], G.Z[i]], 1200, 3500, 1)[0]); const aV = agentes(rV, fV, 16);
+      E.etiquetas.push({ p: LUG.cora, h: 60, html: (e) => `${ico('camion', 20)}<b>Corabastos</b><span>${fmt(e.tru)} camiones/día · ${fmt(e.tru * 4.64)} t</span>` });
+      E.etiquetas.push({ p: () => MERC[0] != null ? [G.X[MERC[0]], G.Z[MERC[0]]] : LUG.cora, h: 40, solo: 'B', html: (e) => `${ico('hoja', 20)}<b>Mercado de barrio + huertas</b><span>compra directa a la región</span>` });
+      E.actualizar = (e, P, B, dt, X) => { aC.ajustar(Math.round(e.tru / 5)); aC.mover(dt, e.tru < 1000 ? 0.12 : 1); mercs.forEach((m, i) => { m.visible = B && i < P.merc; });
+        aV.ajustar(B ? Math.max(8, Math.round(e.reg * NEED * P.dem / 4.64)) : 0); aV.mover(dt); vC.children[0].material.color.set(e.pct < 0.8 ? '#ff4f45' : '#ff8a5b'); vC.children[1].material.color.set(e.pct < 0.8 ? '#ff4f45' : '#ff8a5b'); };
     }
     if (k === 'p2') {
-      const fA = flota(carro(), 320); g.add(fA.g); const rA = rutasHacia(LUG.bav, 500, 1600, 30); const aA = agentes(rA.length ? rA : [conCum([[0, 0], [1, 1]])], fA, 12);
-      const ondas = [0, 1, 2].map(i => { const m = anilloMesh(80 + i * 90, 92 + i * 90, '#f28e2b', 0.35); m.position.set(LUG.bav[0] - 420, Y() + 0.5, LUG.bav[1] + 120); g.add(m); return m; });
-      E.etiquetas.push({ p: [LUG.bav[0] - 420, LUG.bav[1] + 120], h: 40, html: (e) => `${ico('auto', 18)}<b>Av. Boyacá</b><span>${fmt(e.V)} carros/h · ${fmt(e.v, 0)} km/h · ${fmt(e.dB, 0)} dB</span>` });
-      let tt = 0; E.actualizar = (e, P, B, dt) => { aA.ajustar(Math.round(e.V / 25)); aA.mover(dt, e.v / 19.9); tt += dt; ondas.forEach((m, i) => { const s = 1 + ((tt * 0.4 + i / 3) % 1) * (0.6 + (e.dB - 65) / 15); m.scale.set(s, 1, s); m.material.opacity = 0.45 * (1 - ((tt * 0.4 + i / 3) % 1)); m.material.color.set(e.dB > 70 ? '#e15759' : e.dB > 65 ? '#f28e2b' : '#D5FF3F'); }); };
+      const rA = rutasHacia(LUG.bav, 400, 1500, 36); const fA = flota(carro(), 400); g.add(fA.g); const aA = agentes(rA, fA, 14, 5);
+      const vias = rA.slice(0, 12).map(r => { const m = cinta(r.pts, 22, '#ff4f45'); g.add(m); return m; });
+      const centro = [LUG.bav[0] - 420, LUG.bav[1] + 120]; const ondas = [0, 1, 2].map(i => { const d = disco(centro, 120 + i * 120, '#f2b84b', 0.08); g.add(d); return d; });
+      const pas = { visible: false };
+      E.etiquetas.push({ p: centro, h: 50, html: (e) => `${ico('auto', 20)}<b>Av. Boyacá con Américas</b><span>${fmt(e.V)} carros/h · ${fmt(e.v, 0)} km/h · ${fmt(e.dB, 0)} dB</span>` });
+      let tt = 0; E.actualizar = (e, P, B, dt) => { aA.ajustar(Math.round(e.V / 18)); aA.mover(dt, e.v / 19.9); tt += dt; const col = e.v < 15 ? '#ff4f45' : e.v < 25 ? '#f2b84b' : '#D5FF3F'; vias.forEach(m => m.material.color.set(col)); pas.visible = B;
+        ondas.forEach((d, i) => { const s = 1 + ((tt * 0.35 + i / 3) % 1) * (0.5 + (e.dB - 65) / 12); d.scale.set(s, 1, s); d.children.forEach(c => { c.material.opacity = (c.geometry.type === 'RingGeometry' ? 0.8 : 0.1) * (1 - ((tt * 0.35 + i / 3) % 1)); c.material.color.set(e.dB > 70 ? '#ff4f45' : e.dB > 65 ? '#f2b84b' : '#D5FF3F'); }); }); };
     }
     if (k === 'p3') {
-      const fK = flota(compactador(), 80), fV = flota(furgon('#D5FF3F'), 80); g.add(fK.g, fV.g);
-      // salida hacia Doña Juana: nodo mayor más al sur-oriente
+      const fK = flota(compactador(), 120), fV = flota(furgon('#D5FF3F'), 100); g.add(fK.g, fV.g);
       const sal = G.mayores.reduce((b, i) => (G.X[i] + G.Z[i] > G.X[b] + G.Z[b] ? i : b), G.mayores[0]);
-      const tS = G.arbol(sal), barrios = G.idx.filter((i, j) => j % 41 === 0 && Math.hypot(G.X[i] - LUG.central[0], G.Z[i] - LUG.central[1]) < 2600);
+      const tS = G.arbol(sal), barrios = G.idx.filter((i, j) => j % 37 === 0 && Math.hypot(G.X[i] - LUG.central[0], G.Z[i] - LUG.central[1]) < 1400);
       const rK = barrios.slice(0, 30).map(i => G.ruta(tS, i)).filter(r => r && r.length > 3).map(r => conCum(r.slice().reverse()));
-      const aK = agentes(rK.length ? rK : [conCum([[0, 0], [1, 1]])], fK, 10);
-      const est = barrios.filter((_, j) => j % 3 === 0).slice(0, 20).map(i => { const gg = new THREE.Group(); gg.position.set(G.X[i] + 20, Y(), G.Z[i] + 20);
-        const nave = new THREE.Mesh(caja(30, 9, 20), mat('#d8d5cc')), techo = new THREE.Mesh(caja(34, 1.2, 24, 9), mat('#D5FF3F', { emissive: '#2c3608' })); const pila = new THREE.Mesh(new THREE.SphereGeometry(9, 16, 10, 0, 6.29, 0, 1.4).scale(1.5, 1, 1), mat('#4a3423', { roughness: 1 })); pila.position.set(0, 0, 20);
-        gg.add(nave, techo, pila); gg.visible = false; g.add(gg); return { gg, pila, i }; });
-      const rV = est.map(q => { const rs = rutasHacia([G.X[q.i], G.Z[q.i]], 400, 1400, 1, G.idx.filter((_, j) => j % 13 === 0)); return rs[0]; }).filter(Boolean); const aV = agentes(rV.length ? rV : [conCum([[0, 0], [1, 1]])], fV, 8);
-      // bolsas de basura acumulada (puntos críticos)
-      const fB = flota([[new THREE.SphereGeometry(1.1, 10, 8).scale(1, 0.85, 1).translate(0, 0.9, 0), mat('#202326', { roughness: 0.4 })]], 900); g.add(fB.g);
-      const focos = barrios.slice(0, 18).map(i => [G.X[i] + 8, G.Z[i] - 8]);
-      E.etiquetas.push({ p: LUG.central, h: 50, html: (e) => `${ico('residuo', 18)}<b>Kennedy</b><span>${fmt(e.tot)} t/día · ${fmt(e.cam)} camiones al relleno</span>` });
-      E.actualizar = (e, P, B, dt) => { aK.ajustar(Math.round(e.cam / 4)); aK.mover(dt); est.forEach((q, i) => { q.gg.visible = B && i < P.est; const s = 0.5 + Math.min(1.6, e.proc / Math.max(1, P.est * 12)); q.pila.scale.set(1.5 * s, s, s); });
-        aV.ajustar(B ? Math.round(e.proc / 6) : 0); aV.mover(dt);
-        const nb = Math.min(900, Math.round(e.acum / 4)); for (let i = 0; i < nb; i++) { const f = focos[i % focos.length], a = i * 2.39996, r = 3 + Math.sqrt(i / focos.length) * 3.2; fB.poner(i, f[0] + Math.cos(a) * r, Y() + Math.floor(i / (focos.length * 12)) * 1.2, f[1] + Math.sin(a) * r, a, ESCALA_VIS * 0.9); } fB.fin(nb); };
+      const aK = agentes(rK.length ? rK : rutasHacia(LUG.central, 300, 1500, 10), fK, 13);
+      const est = barrios.filter((_, j) => j % 2 === 0).slice(0, 20).map(i => { const c = [G.X[i] + 25, G.Z[i] + 25], gg = new THREE.Group(); gg.add(volumen(rect(c, 70, 45), 24, '#D5FF3F', 0.55));
+        const pila = new THREE.Mesh(new THREE.SphereGeometry(14, 18, 10, 0, 6.29, 0, 1.4).scale(1.6, 1, 1), mat('#6b4a2c', { roughness: 1 })); pila.position.set(c[0], Y(), c[1] + 50); pila.renderOrder = RO + 2; gg.add(pila); gg.visible = false; g.add(gg); return { gg, pila, i }; });
+      const rV = est.map(q => rutasHacia([G.X[q.i], G.Z[q.i]], 300, 1100, 1, G.idx.filter((_, j) => j % 11 === 0))[0]); const aV = agentes(rV, fV, 11);
+      const focos = barrios.slice(0, 16).map(i => [G.X[i] + 10, G.Z[i] - 10]);
+      const pilas = focos.map(f => { const m = new THREE.Mesh(new THREE.CylinderGeometry(22, 26, 1, 20).translate(0, 0.5, 0), brillo('#ff4f45', 0.7)); m.position.set(f[0], Y(), f[1]); m.renderOrder = RO + 1; g.add(m); return m; });
+      E.etiquetas.push({ p: LUG.central, h: 60, html: (e) => `${ico('residuo', 20)}<b>Kennedy</b><span>${fmt(e.tot)} t/día · ${fmt(e.cam)} camiones a Doña Juana</span>` });
+      E.etiquetas.push({ p: () => est[0] ? [G.X[est[0].i] + 25, G.Z[est[0].i] + 25] : LUG.central, h: 40, solo: 'B', html: (e) => `${ico('hoja', 20)}<b>Estación Circular</b><span>${fmt(e.comp, 1)} t de compost al día</span>` });
+      E.actualizar = (e, P, B, dt) => { aK.ajustar(Math.round(e.cam / 2)); aK.mover(dt); est.forEach((q, i) => { q.gg.visible = B && i < P.est; const s = 0.5 + Math.min(1.6, e.proc / Math.max(1, P.est * 12)); q.pila.scale.set(1.6 * s, s, s); });
+        aV.ajustar(B ? Math.round(e.proc / 4) : 0); aV.mover(dt); const h = 1 + e.acum / 8; pilas.forEach(m => { m.scale.y = h; }); };
     }
     if (k === 'p4') {
-      // aves: una por especie, volando en círculos sobre el humedal; corredores verdes con la propuesta
       const ave = new THREE.BufferGeometry(); ave.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 1.6, -2.4, 0, -0.6, 0, 0.25, -0.2, 0, 0, 1.6, 0, 0.25, -0.2, 2.4, 0, -0.6, 0, 0, 1.6, 0, -0.3, -1.2, 0, 0.25, -0.2], 3)); ave.computeVertexNormals();
-      const fAv = flota([[ave, mat('#2b2f2c', { side: THREE.DoubleSide })]], 90); g.add(fAv.g);
+      const fAv = flota([[ave, mat('#ffffff', { emissive: '#bfc7c2', side: THREE.DoubleSide })]], 100); g.add(fAv.g);
+      const HUM = [[LUG.burro, 18.8], [LUG.vaca, 9.95], [LUG.techo, 11.67]];
+      const zonas = HUM.map(([c, ha]) => { const d = disco(c, Math.sqrt(ha * 1e4 / Math.PI) * 1.4, '#3fd17a', 0.28); g.add(d); return d; });
       const pts = [LUG.burro, LUG.vaca, LUG.techo, LUG.bav];
-      const corr = [[0, 1], [0, 2], [0, 3]].map(([a, b]) => { const A = pts[a], B2 = pts[b], c = new THREE.QuadraticBezierCurve3(new THREE.Vector3(A[0], Y() + 2, A[1]), new THREE.Vector3((A[0] + B2[0]) / 2, Y() + 2, (A[1] + B2[1]) / 2 + 80), new THREE.Vector3(B2[0], Y() + 2, B2[1]));
-        const m = new THREE.Mesh(new THREE.TubeGeometry(c, 60, 14, 6), new THREE.MeshBasicMaterial({ color: '#59a14f', transparent: true, opacity: 0.75, toneMapped: false })); m.visible = false; g.add(m); return m; });
-      const hum = anilloMesh(260, 285, '#59a14f', 0.8); hum.position.set(LUG.burro[0], Y() + 0.5, LUG.burro[1]); g.add(hum);
-      const AV = Array.from({ length: 90 }, (_, i) => ({ c: pts[i % 3], r: 80 + Math.random() * 220, a: Math.random() * 6.28, h: 25 + Math.random() * 50, w: 0.15 + Math.random() * 0.25 }));
-      E.etiquetas.push({ p: LUG.burro, h: 90, html: (e) => `${ico('ave', 18)}<b>Humedal El Burro</b><span>${fmt(e.S)} especies de aves</span>` });
-      E.actualizar = (e, P, B, dt) => { const n = Math.round(e.S); for (let i = 0; i < n; i++) { const a = AV[i]; a.a += a.w * dt; fAv.poner(i, a.c[0] + Math.cos(a.a) * a.r, Y() + a.h + Math.sin(a.a * 3) * 3, a.c[1] + Math.sin(a.a) * a.r, -a.a, 3.4); } fAv.fin(n);
-        corr.forEach(m => { m.visible = B && P.corr > 0; m.scale.setScalar(1); }); hum.material.color.set(e.S <= 34.3 ? '#e15759' : e.S < 45 ? '#f28e2b' : '#59a14f'); };
+      const corr = [[0, 1], [0, 2], [0, 3], [1, 3]].map(([a, b]) => { const A = pts[a], B2 = pts[b], L = 24, line = Array.from({ length: L + 1 }, (_, i) => { const t = i / L; return [A[0] + (B2[0] - A[0]) * t + Math.sin(t * Math.PI) * 60, A[1] + (B2[1] - A[1]) * t]; }); const m = cinta(line, 40, '#D5FF3F'); m.visible = false; g.add(m); return m; });
+      const AV = Array.from({ length: 100 }, (_, i) => ({ c: pts[i % 3], r: 60 + Math.random() * 200, a: Math.random() * 6.28, h: 30 + Math.random() * 60, w: 0.2 + Math.random() * 0.3 }));
+      E.etiquetas.push({ p: LUG.burro, h: 110, html: (e) => `${ico('ave', 20)}<b>Humedal El Burro</b><span>${fmt(e.S)} especies de aves (hoy 49)</span>` });
+      E.actualizar = (e, P, B, dt) => { const n = Math.round(e.S); for (let i = 0; i < n; i++) { const a = AV[i]; a.a += a.w * dt; fAv.poner(i, a.c[0] + Math.cos(a.a) * a.r, Y() + a.h + Math.sin(a.a * 3) * 4, a.c[1] + Math.sin(a.a) * a.r, -a.a, 9); } fAv.fin(n);
+        corr.forEach(m => { m.visible = B && P.corr > 0; }); const col = e.S <= 34.3 ? '#ff4f45' : e.S < 45 ? '#f2b84b' : '#3fd17a'; zonas.forEach(z => z.children.forEach(c => c.material.color.set(col))); };
     }
     if (k === 'p5') {
-      // torres de población: 1 piso = 10.000 habitantes; parques verdes; colegios nuevos
-      const torre = (p) => { const gg = new THREE.Group(); gg.position.set(p[0], Y(), p[1]); g.add(gg); const pisos = []; for (let i = 0; i < 26; i++) { const m = new THREE.Mesh(caja(110, 11, 110, i * 13), mat(i % 2 ? '#c9c4b8' : '#b7b1a4')); m.visible = false; gg.add(m); pisos.push(m); } return pisos; };
-      const PB = torre(LUG.patio), TN = torre(LUG.tintal);
-      const verde = new THREE.Mesh(new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#59a14f', transparent: true, opacity: 0.55, depthWrite: false })); verde.position.set(LUG.tintal[0] + 380, Y() + 0.4, LUG.tintal[1] - 200); g.add(verde);
-      const cols = Array.from({ length: 12 }, (_, i) => { const m = new THREE.Mesh(caja(40, 14, 40), mat('#D5FF3F', { emissive: '#2c3608' })); const a = i * 0.52; m.position.set(LUG.patio[0] + 500 + Math.cos(a) * 260, Y(), LUG.patio[1] + Math.sin(a) * 260); m.visible = false; g.add(m); return m; });
-      E.etiquetas.push({ p: LUG.patio, h: 360, html: (e) => `${ico('casa', 18)}<b>Patio Bonito</b><span>${fmt(e.pb)} hab · ${fmt(e.pb / 317)} hab/ha</span>` });
-      E.etiquetas.push({ p: LUG.tintal, h: 120, html: (e) => `${ico('casa', 18)}<b>Tintal Norte</b><span>${fmt(e.tn)} hab · ${fmt(e.tn / 343)} hab/ha</span>` });
-      E.actualizar = (e, P, B) => { const a = Math.round(e.pb / 1e4), b = Math.round(e.tn / 1e4); PB.forEach((m, i) => { m.visible = i < a; }); TN.forEach((m, i) => { m.visible = i < b; });
-        const r = Math.sqrt(Math.max(0, e.parque) * 3e4 / Math.PI); verde.scale.set(r, 1, r); cols.forEach((m, i) => { m.visible = B && i < P.eq; }); };
+      const torre = (c, area) => { const lado = Math.sqrt(area * 1e4) * 0.3, gg = new THREE.Group(); g.add(gg); return { gg, c, lado, cur: null }; };
+      const T = [torre(LUG.patio, 317), torre(LUG.tintal, 343)];
+      const ponerT = (t, h, col) => { if (t.cur && Math.abs(t.cur.h - h) < 2) return; t.gg.clear(); const v = volumen(rect(t.c, t.lado, t.lado), h, col, 0.32); t.gg.add(v); t.cur = { h }; };
+      const verde = new THREE.Group(); g.add(verde); let verdeR = -1;
+      const cols = Array.from({ length: 12 }, (_, i) => { const a = i * 0.52, c = [LUG.patio[0] + 700 + Math.cos(a) * 380, LUG.patio[1] + Math.sin(a) * 380]; const v = volumen(rect(c, 70, 50), 20, '#D5FF3F', 0.7); v.visible = false; g.add(v); return v; });
+      E.etiquetas.push({ p: LUG.patio, h: () => 0, alto: (e) => e.pb / 317 * 0.5 + 30, html: (e) => `${ico('casa', 20)}<b>Patio Bonito</b><span>${fmt(e.pb / 317)} personas por hectárea</span>` });
+      E.etiquetas.push({ p: LUG.tintal, h: () => 0, alto: (e) => e.tn / 343 * 0.5 + 30, html: (e) => `${ico('casa', 20)}<b>Tintal Norte</b><span>${fmt(e.tn / 343)} personas por hectárea</span>` });
+      E.actualizar = (e, P, B) => { ponerT(T[0], e.pb / 317 * 0.5, '#b45cff'); ponerT(T[1], e.tn / 343 * 0.5, '#b45cff');
+        const r = Math.round(Math.sqrt(Math.max(0, e.parque) * 6e4 / Math.PI)); if (r !== verdeR) { verdeR = r; verde.clear(); verde.add(disco([LUG.tintal[0] + 500, LUG.tintal[1] - 300], Math.max(20, r), '#3fd17a', 0.3)); }
+        cols.forEach((m, i) => { m.visible = B && i < P.eq; }); };
     }
     if (k === 'p6') {
-      const mon = new THREE.CylinderGeometry(9, 9, 2.4, 24).translate(0, 1.2, 0), fM = flota([[mon, mat('#e2b13c', { metalness: 0.8, roughness: 0.3 })]], 800); g.add(fM.g);
-      const vuelo = []; E.etiquetas.push(...SECTORES.map((q, i) => ({ p: q.p, h: 70, html: (e) => `${ico('moneda', 18)}<b>${q.n}</b><span>${fmt((e.asig[i] || 0) / 1000, 1)} mil M · ${e.nec && e.nec[i] > 0 ? (e.asig[i] >= e.nec[i] * 0.8 ? 'atendido' : 'le falta') : 'sin necesidad'}</span>` })));
-      E.etiquetas.push({ p: LUG.alcaldia, h: 40, html: () => `${ico('moneda', 18)}<b>Fondo de Desarrollo Local</b><span>193.000 millones (2025)</span>` });
-      let tt = 0; E.actualizar = (e, P, B, dt) => { tt += dt; let n = 0; SECTORES.forEach((q, i) => { const m = Math.round((e.asig[i] || 0) / 1000); for (let j = 0; j < m && n < 760; j++, n++) { const col = j % 4, piso = Math.floor(j / 4); fM.poner(n, q.p[0] + (col % 2) * 22 - 11, Y() + piso * 2.6, q.p[1] + (col >> 1) * 22 - 11, 0, 1); } });
-        for (let k2 = 0; k2 < 30 && n < 800; k2++, n++) { const q = SECTORES[k2 % SECTORES.length], f = ((tt * 0.25 + k2 / 30) % 1), x = LUG.alcaldia[0] + (q.p[0] - LUG.alcaldia[0]) * f, z = LUG.alcaldia[1] + (q.p[1] - LUG.alcaldia[1]) * f; fM.poner(n, x, Y() + 20 + Math.sin(f * Math.PI) * 160, z, tt, 1); }
-        fM.fin(n); };
+      const fondo = volumen(circulo(LUG.alcaldia, 60, 24), 120, '#f2c94c', 0.65); g.add(fondo);
+      const S2 = SECTORES.map(q => { const gg = new THREE.Group(); g.add(gg); return { q, gg, cur: '' }; });
+      const fM = flota([[new THREE.CylinderGeometry(7, 7, 2, 16).translate(0, 1, 0), mat('#f2c94c', { emissive: '#7a5a10', metalness: 0.6 })]], 60); g.add(fM.g);
+      E.etiquetas.push(...SECTORES.map((q, i) => ({ p: q.p, h: () => 0, alto: (e) => Math.max(e.asig[i] || 0, (e.nec && e.nec[i]) || 0) / 80 + 40, html: (e) => `${ico('moneda', 20)}<b>${q.n}</b><span>${fmt((e.asig[i] || 0) / 1000, 1)} mil M · ${e.nec && e.nec[i] > 0 ? (e.asig[i] >= e.nec[i] * 0.8 ? 'atendido' : 'le falta') : 'sin necesidad'}</span>` })));
+      let tt = 0; E.actualizar = (e, P, B, dt) => { tt += dt;
+        S2.forEach((s, i) => { const h = (e.asig[i] || 0) / 80, hn = (e.nec && e.nec[i] || 0) / 80, firma = Math.round(h) + '|' + Math.round(hn); if (firma === s.cur) return; s.cur = firma; s.gg.clear();
+          const ok = hn > 0 ? h >= hn * 0.8 : true; if (h > 1) s.gg.add(volumen(circulo(s.q.p, 70, 24), h, ok ? '#D5FF3F' : '#ff4f45', 0.6));
+          if (hn > 1) { const v = volumen(circulo(s.q.p, 90, 24), hn, '#F4F3EF', 0.0); v.children[0].visible = false; s.gg.add(v); } });
+        for (let k2 = 0; k2 < 60; k2++) { const q = SECTORES[k2 % SECTORES.length], f = ((tt * 0.25 + k2 / 60) % 1); fM.poner(k2, LUG.alcaldia[0] + (q.p[0] - LUG.alcaldia[0]) * f, Y() + 130 + Math.sin(f * Math.PI) * 200, LUG.alcaldia[1] + (q.p[1] - LUG.alcaldia[1]) * f, tt * 3, 2.2, 1); } fM.fin(60); };
     }
     ESC[k] = E; return E;
   }
 
-  /* ---------- estado de la corrida (par A/B) ---------- */
+  /* ---------- estado (par A/B) ---------- */
   let VUELO = null;
-  const ST = { k: null, modo: (() => { try { return localStorage.getItem('ss-modo') || 'ninos'; } catch (e) { return 'ninos'; } })(), ver: 'B', t: 0, corre: false, vel: 4, A: null, B: null, par: {}, pertOn: false, pertHasta: 0 };
+  const ST = { k: null, modo: (() => { try { return localStorage.getItem('ss-modo') || 'ninos'; } catch (e) { return 'ninos'; } })(), ver: 'A', t: 0, corre: true, vel: 4, A: null, B: null, par: {}, pertOn: false, pertHasta: 0 };
   const sim = () => SIMS.find(s => s.k === ST.k);
   function reiniciar() { const S = sim(); ST.t = 0; ST.A = S.estado(); ST.B = S.estado(); ST.pertOn = false; ST.pertHasta = 0; paso(); }
-  function paso() { const S = sim(), X = { pertOn: ST.pertOn }; if (S.k === 'p1' && ST.pertOn && ST.A.bloq === 0 && ST.t === ST.pertIni) { ST.A.bloq = ST.B.bloq = ST.par.bloqDur; }
-    S.paso(ST.A, ST.par, false, ST.t, X); S.paso(ST.B, ST.par, true, ST.t, X); if (ST.pertOn && ST.t >= ST.pertHasta) ST.pertOn = false; }
+  function paso() { const S = sim(), X = { pertOn: ST.pertOn }; S.paso(ST.A, ST.par, false, ST.t, X); S.paso(ST.B, ST.par, true, ST.t, X); if (ST.pertOn && ST.t >= ST.pertHasta) ST.pertOn = false; }
 
-  /* ---------- interfaz ---------- */
+  /* ---------- interfaz: barra superior con las 6 simulaciones, interruptor literal SIN/CON, una tarjeta ---------- */
   const css = document.createElement('style'); css.textContent = `
   .ss-i{display:inline-block;vertical-align:middle;flex:none}
-  #ss-bar{position:fixed;left:14px;top:84px;bottom:20px;z-index:32;width:262px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding:8px;background:rgba(9,14,11,.9);border:1px solid rgba(213,255,63,.22);border-radius:4px;backdrop-filter:blur(12px)}
-  .ss-row{padding:8px;border:1px solid rgba(244,243,239,.08);border-radius:3px} .ss-row.on{border-color:#D5FF3F;background:rgba(213,255,63,.06)}
-  .ss-row .t{display:flex;align-items:center;gap:8px;font:800 12px Manrope,sans-serif;color:#F4F3EF;letter-spacing:.02em;margin-bottom:7px} .ss-row .t .ss-i{color:#D5FF3F} .ss-row .t small{display:block;font:600 11px Manrope;color:#b5bcb3;letter-spacing:0}
-  .ss-row .b{display:grid;grid-template-columns:1fr 1fr;gap:5px} .ss-row .b button{padding:9px 4px;background:rgba(244,243,239,.04);border:1px solid rgba(244,243,239,.16);border-radius:2px;color:#dfe3dc;font:800 10.5px Manrope;letter-spacing:.03em;cursor:pointer}
-  .ss-row .b button:hover{border-color:#D5FF3F} .ss-row .b button.on{background:#D5FF3F;color:#08090C;border-color:#D5FF3F} .ss-row .b button[data-v="A"].on{background:#F4F3EF;border-color:#F4F3EF}
-  .ss-mas{margin-top:auto;padding:9px;background:none;border:1px dashed rgba(244,243,239,.2);border-radius:3px;color:#b5bcb3;font:600 11px Manrope;cursor:pointer}
-  #ss-modo{position:fixed;top:14px;right:300px;z-index:40;display:flex;background:rgba(9,14,11,.86);border:1px solid rgba(213,255,63,.3);border-radius:3px;overflow:hidden}
-  #ss-modo button{display:flex;align-items:center;gap:6px;padding:9px 13px;background:none;border:0;color:#b5bcb3;font:700 12px Manrope,sans-serif;cursor:pointer} #ss-modo button.on{background:#D5FF3F;color:#08090C}
-  #ss-pan{position:fixed;right:14px;top:84px;bottom:20px;z-index:33;width:min(400px,calc(100vw - 28px));display:none;flex-direction:column;background:rgba(9,14,11,.94);border:1px solid rgba(213,255,63,.22);border-radius:4px;color:#F4F3EF;font-family:Manrope,sans-serif;backdrop-filter:blur(14px);overflow:auto}
-  body.ss-on #ss-pan{display:flex} body.ss-simple #gs-izq, body.ss-simple #dock, body.ss-simple #dr-btn, body.ss-simple #dr-pan, body.ss-simple #cvMini, body.ss-simple #cvAyuda, body.ss-simple #hud-c, body.ss-simple #toast, body.ss-simple #esc, body.ss-simple #esim, body.ss-simple .es-et, body.ss-simple #gs-cv2, body.ss-simple #gs-der, body.ss-simple #bt-pan, body.ss-simple #hid-red{display:none!important} body.ss-simple .u-fuentes-btn{left:auto;right:14px;bottom:auto;top:60px;display:none} body.ss-simple:not(.ss-ninos) .u-fuentes-btn{display:none}
-  body.ss-ninos #gs-der, body.ss-ninos #bt-pan, body.ss-ninos #hid-red{display:none!important}
-  .ss-h{display:flex;align-items:center;gap:10px;padding:16px 16px 6px} .ss-h .ic{width:46px;height:46px;display:grid;place-items:center;background:#D5FF3F;color:#08090C;border-radius:3px}
-  .ss-h b{font-size:17px;line-height:1.15} .ss-h small{display:block;font:500 9.5px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#D5FF3F;text-transform:uppercase;margin-bottom:3px}
-  .ss-h .x{margin-left:auto;background:none;border:0;color:#b5bcb3;cursor:pointer}
-  .ss-txt{padding:4px 16px 8px;font-size:14px;line-height:1.5;color:#dfe3dc} .ss-esc{margin:0 16px 10px;font:500 11px 'JetBrains Mono',monospace;color:#b5bcb3;display:flex;gap:6px;align-items:center}
-  .ss-sw{display:grid;grid-template-columns:1fr 1fr;margin:4px 16px 12px;border:1px solid rgba(213,255,63,.35);border-radius:3px;overflow:hidden}
-  .ss-sw button{padding:13px 6px;background:none;border:0;color:#b5bcb3;font:800 13px Manrope;cursor:pointer;letter-spacing:.02em} .ss-sw button.on{background:#D5FF3F;color:#08090C}
-  .ss-ctrl{padding:6px 16px} .ss-ctrl label{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#dfe3dc} .ss-ctrl label b{margin-left:auto;font:600 13px 'JetBrains Mono',monospace;color:#D5FF3F}
-  .ss-ctrl input{width:100%;accent-color:#D5FF3F;height:26px} body.ss-ninos .ss-ctrl input{height:34px}
-  .ss-pert{margin:8px 16px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:#2a1513;border:1px solid #e15759;color:#ffb3ab;font:700 13px Manrope;border-radius:3px;cursor:pointer} .ss-pert.on{background:#e15759;color:#fff}
-  .ss-tiempo{display:flex;align-items:center;gap:8px;margin:6px 16px;padding:8px 10px;border:1px solid rgba(244,243,239,.1);border-radius:3px}
-  .ss-tiempo button{display:grid;place-items:center;width:38px;height:38px;background:rgba(213,255,63,.08);border:1px solid rgba(213,255,63,.3);color:#D5FF3F;border-radius:3px;cursor:pointer}
-  .ss-tiempo .bar{flex:1;height:6px;background:rgba(244,243,239,.1);border-radius:3px;overflow:hidden} .ss-tiempo .bar i{display:block;height:100%;background:#D5FF3F}
-  .ss-tiempo span{font:500 11px 'JetBrains Mono',monospace;color:#b5bcb3;min-width:92px;text-align:right}
-  .ss-res{margin:8px 16px;padding:12px;border-radius:3px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:14px} .ss-res.ok{background:rgba(89,161,79,.16);border:1px solid #59a14f;color:#bfe8b6} .ss-res.mal{background:rgba(225,87,89,.16);border:1px solid #e15759;color:#ffc2bd}
-  .ss-k3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 16px} .ss-k3 div{background:rgba(213,255,63,.05);border:1px solid rgba(244,243,239,.1);border-radius:3px;padding:10px 8px;text-align:center}
-  .ss-k3 b{display:block;font:700 20px 'JetBrains Mono',monospace;color:#F4F3EF;margin-top:6px} .ss-k3 span{font-size:11px;color:#b5bcb3} .ss-k3 .ss-i{color:#D5FF3F}
-  .ss-tab{margin:8px 16px 14px;border-collapse:collapse;width:calc(100% - 32px);font-size:11.5px} .ss-tab th{font:500 9px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#7d877e;text-align:left;padding:6px 4px;border-bottom:1px solid rgba(244,243,239,.12)}
+  body.ss-simple #cvMarca, body.ss-simple #gs-izq, body.ss-simple #dock, body.ss-simple #dr-btn, body.ss-simple #dr-pan, body.ss-simple #cvMini, body.ss-simple #cvAyuda, body.ss-simple #hud-c, body.ss-simple #toast, body.ss-simple #esc, body.ss-simple #esim, body.ss-simple .es-et, body.ss-simple #gs-cv2, body.ss-simple #gs-der, body.ss-simple #bt-pan, body.ss-simple #hid-red, body.ss-simple .u-fuentes-btn, body.ss-simple #ss-old{display:none!important}
+  #ss-top{position:fixed;left:0;right:0;top:0;height:62px;z-index:40;display:flex;align-items:center;gap:14px;padding:0 18px;background:linear-gradient(180deg,rgba(7,10,8,.96),rgba(7,10,8,.86));border-bottom:1px solid rgba(213,255,63,.18);font-family:Manrope,sans-serif;color:#F4F3EF}
+  #ss-top .lg{display:flex;align-items:center;gap:12px;flex:none} #ss-top .lg img.u{height:24px} #ss-top .lg img.j{height:28px} #ss-top .lg i{width:1px;height:26px;background:rgba(244,243,239,.22)}
+  #ss-tabs{flex:1;display:flex;justify-content:center;gap:4px;overflow-x:auto;scrollbar-width:none} #ss-tabs::-webkit-scrollbar{display:none}
+  #ss-tabs button{flex:none;display:flex;align-items:center;gap:8px;padding:8px 13px;background:none;border:1px solid transparent;border-radius:22px;color:#c9cec6;font:700 12.5px Manrope;cursor:pointer;white-space:nowrap}
+  #ss-tabs button b{font:600 10px 'JetBrains Mono',monospace;color:#7d877e;letter-spacing:.08em} #ss-tabs button:hover{border-color:rgba(213,255,63,.35)}
+  #ss-tabs button.on{border-color:#D5FF3F;color:#F4F3EF;background:rgba(213,255,63,.1)} #ss-tabs button.on b{color:#D5FF3F} #ss-tabs button .ss-i{color:#D5FF3F}
+  #ss-modo{flex:none;display:flex;background:rgba(244,243,239,.06);border-radius:22px;padding:3px} #ss-modo button{display:flex;align-items:center;gap:6px;padding:7px 13px;background:none;border:0;border-radius:20px;color:#b5bcb3;font:700 12px Manrope;cursor:pointer} #ss-modo button.on{background:#D5FF3F;color:#08090C}
+  #ss-fu{flex:none;color:#b5bcb3;font:600 12px Manrope;text-decoration:none;display:flex;align-items:center;gap:6px} #ss-fu:hover{color:#D5FF3F}
+  #ss-sw{position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:39;display:flex;background:rgba(7,10,8,.9);border:1px solid rgba(213,255,63,.4);border-radius:30px;padding:4px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  #ss-sw button{padding:11px 22px;border:0;border-radius:26px;background:none;color:#c9cec6;font:800 13px Manrope;letter-spacing:.03em;cursor:pointer;white-space:nowrap}
+  #ss-sw button.on[data-v="A"]{background:#F4F3EF;color:#08090C} #ss-sw button.on[data-v="B"]{background:#D5FF3F;color:#08090C}
+  #ss-pan{position:fixed;right:16px;top:78px;z-index:38;width:340px;max-height:calc(100vh - 96px);overflow:auto;background:rgba(9,13,11,.9);border:1px solid rgba(244,243,239,.1);border-radius:14px;color:#F4F3EF;font-family:Manrope,sans-serif;backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.4);scrollbar-width:thin}
+  body.ss-adultos #ss-pan{width:400px}
+  .ss-h{display:flex;align-items:flex-start;gap:10px;padding:16px 16px 4px} .ss-h small{display:block;font:600 10px 'JetBrains Mono',monospace;letter-spacing:.14em;color:#D5FF3F;text-transform:uppercase;margin-bottom:4px} .ss-h b{font-size:17px;line-height:1.2}
+  .ss-txt{padding:4px 16px 10px;font-size:13px;line-height:1.5;color:#c9cec6}
+  .ss-rings{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px 10px 10px;border-top:1px solid rgba(244,243,239,.07);border-bottom:1px solid rgba(244,243,239,.07)}
+  .ss-rings div{display:flex;flex-direction:column;align-items:center;text-align:center;position:relative} .ss-rings em{position:absolute;top:21px;font:700 12px 'JetBrains Mono',monospace;font-style:normal;width:64px;left:50%;transform:translateX(-50%)} .ss-rings span{font-size:10.5px;color:#b5bcb3;margin-top:4px;line-height:1.25}
+  .ss-res{margin:12px 16px 4px;padding:10px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px} .ss-res.ok{background:rgba(213,255,63,.1);color:#D5FF3F} .ss-res.mal{background:rgba(255,79,69,.14);color:#ff8f87} .ss-res small{display:block;font-weight:500;font-size:11px;color:#c9cec6}
+  .ss-ctrl{padding:8px 16px 0} .ss-ctrl label{display:flex;align-items:center;gap:8px;font-size:12px;color:#dfe3dc} .ss-ctrl label b{margin-left:auto;font:700 12px 'JetBrains Mono',monospace;color:#D5FF3F}
+  .ss-ctrl input{width:100%;accent-color:#D5FF3F;margin:6px 0 2px}
+  .ss-bt{display:grid;grid-template-columns:1fr auto auto;gap:6px;padding:12px 16px 16px}
+  .ss-pert{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 8px;background:rgba(255,79,69,.12);border:1px solid rgba(255,79,69,.55);color:#ffb3ab;font:700 12px Manrope;border-radius:10px;cursor:pointer} .ss-pert.on{background:#ff4f45;color:#fff}
+  .ss-bt .r{display:grid;place-items:center;width:42px;background:rgba(213,255,63,.08);border:1px solid rgba(213,255,63,.3);color:#D5FF3F;border-radius:10px;cursor:pointer}
+  .ss-tl{padding:0 16px 12px;display:flex;align-items:center;gap:8px;font:500 10.5px 'JetBrains Mono',monospace;color:#7d877e} .ss-tl .bar{flex:1;height:4px;background:rgba(244,243,239,.1);border-radius:2px;overflow:hidden} .ss-tl .bar i{display:block;height:100%;background:#D5FF3F}
+  .ss-esc{display:flex;align-items:center;gap:6px;padding:0 16px 12px;font-size:11px;color:#7d877e}
+  .ss-tab{margin:4px 16px 10px;border-collapse:collapse;width:calc(100% - 32px);font-size:11.5px} .ss-tab th{font:600 9px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#7d877e;text-align:left;padding:6px 4px;border-bottom:1px solid rgba(244,243,239,.12)}
   .ss-tab td{padding:7px 4px;border-bottom:1px solid rgba(244,243,239,.07);vertical-align:top} .ss-tab td.n{font:600 11.5px 'JetBrains Mono',monospace;text-align:right;white-space:nowrap} .ss-tab td.b{color:#D5FF3F} .ss-tab td.f{color:#7d877e;font-size:10.5px}
-  .ss-go{margin:8px 16px;padding:10px 12px;border:1px solid #e15759;background:rgba(225,87,89,.12);border-radius:3px;font-size:12px;color:#ffc2bd;line-height:1.5}
-  .ss-link{margin:0 16px 16px;font-size:11.5px} .ss-link a{color:#D5FF3F}
-  #ss-lbl{position:fixed;inset:0;pointer-events:none;z-index:20} .ss-l{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;gap:7px;padding:7px 11px;background:rgba(9,14,11,.88);border:1px solid rgba(213,255,63,.45);border-radius:3px;color:#F4F3EF;font:600 12px Manrope;white-space:nowrap}
-  .ss-l .ss-i{color:#D5FF3F} .ss-l span{font-weight:500;color:#b5bcb3;margin-left:4px} body.ss-ninos .ss-l{font-size:14px;padding:9px 13px}
-  @media(max-width:760px){#ss-bar{top:auto;bottom:8px;left:8px;right:8px;width:auto;flex-direction:row;overflow-x:auto;padding:6px}.ss-row{min-width:200px}.ss-mas{display:none}#ss-modo{right:8px;top:70px}#ss-pan{left:8px;right:8px;width:auto;top:auto;bottom:128px;max-height:46vh}}`;
+  .ss-go{margin:8px 16px;padding:10px 12px;border:1px solid #ff4f45;background:rgba(255,79,69,.1);border-radius:10px;font-size:12px;color:#ffc2bd;line-height:1.5}
+  .ss-lg{padding:0 16px 16px;font-size:11.5px;color:#c9cec6} .ss-lg b{color:#F4F3EF} .ss-lg a{color:#D5FF3F} .ss-lg ul{margin:6px 0 0;padding-left:16px;line-height:1.45}
+  #ss-lbl{position:fixed;inset:0;pointer-events:none;z-index:20} .ss-l{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center}
+  .ss-l .c{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(7,10,8,.92);border:1px solid rgba(213,255,63,.55);border-radius:10px;color:#F4F3EF;font:700 13px Manrope;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+  .ss-l .c .ss-i{color:#D5FF3F} .ss-l .c span{display:block;font:500 11.5px Manrope;color:#c9cec6} .ss-l i{width:1px;height:34px;background:linear-gradient(#D5FF3F,rgba(213,255,63,0))} .ss-l .p{width:9px;height:9px;border-radius:50%;background:#D5FF3F;box-shadow:0 0 0 4px rgba(213,255,63,.25)}
+  @media(max-width:860px){#ss-top{height:auto;flex-wrap:wrap;padding:8px 10px;gap:8px}#ss-top .lg img.j,#ss-top .lg i,#ss-fu{display:none}#ss-tabs{order:3;flex-basis:100%;justify-content:flex-start}#ss-tabs button span{display:none}
+    #ss-sw{top:auto;bottom:calc(42vh + 14px)}#ss-sw button{padding:9px 12px;font-size:11px}#ss-pan,body.ss-adultos #ss-pan{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:42vh}.ss-l .c{font-size:11px;padding:6px 9px}.ss-l .c span{font-size:10px}}`;
   document.head.appendChild(css);
-  const bar = document.createElement('div'); bar.id = 'ss-bar';
-  bar.innerHTML = SIMS.map((s, i) => `<div class="ss-row" data-k="${s.k}"><div class="t">${ico(s.ic, 22)}<div>SIMULACIÓN ${i + 1}<small>${s.largo}</small></div></div><div class="b"><button data-k="${s.k}" data-v="A">SIN PROPUESTA</button><button data-k="${s.k}" data-v="B">CON PROPUESTA</button></div></div>`).join('') + '<button class="ss-mas" data-a="mas">Herramientas avanzadas</button>';
-  const modo = document.createElement('div'); modo.id = 'ss-modo'; modo.innerHTML = `<button data-m="ninos">${ico('nino', 16)}Niños</button><button data-m="adultos">${ico('adulto', 16)}Adultos</button>`;
+  const top = document.createElement('div'); top.id = 'ss-top';
+  top.innerHTML = `<div class="lg"><img class="u" src="urbia_logo.svg" alt="urbia"><i></i><img class="j" src="img_javeriana_claro.png" alt="Pontificia Universidad Javeriana"></div>
+    <div id="ss-tabs">${SIMS.map((s, i) => `<button data-k="${s.k}">${ico(s.ic, 18)}<b>SIM ${i + 1}</b><span>${s.n}</span></button>`).join('')}</div>
+    <div id="ss-modo"><button data-m="ninos">${ico('nino', 15)}Niños</button><button data-m="adultos">${ico('adulto', 15)}Adultos</button></div>
+    <a id="ss-fu" href="fuentes.html" target="_blank" rel="noopener">${ico('tabla', 16)}Fuentes</a>`;
+  const sw = document.createElement('div'); sw.id = 'ss-sw';
   const pan = document.createElement('div'); pan.id = 'ss-pan';
   const lbl = document.createElement('div'); lbl.id = 'ss-lbl';
-  document.body.append(bar, modo, pan, lbl);
-  const marcarMenu = () => { bar.querySelectorAll('.ss-row').forEach(r => r.classList.toggle('on', r.dataset.k === ST.k)); bar.querySelectorAll('.ss-row .b button').forEach(x => x.classList.toggle('on', x.dataset.k === ST.k && x.dataset.v === ST.ver)); };
-  const pintarModo = () => { modo.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === ST.modo)); document.body.classList.toggle('ss-ninos', ST.modo === 'ninos'); };
+  document.body.append(top, sw, pan, lbl); document.body.classList.add('ss-simple', 'ss-on');
+  const pintarModo = () => { top.querySelectorAll('#ss-modo button').forEach(b => b.classList.toggle('on', b.dataset.m === ST.modo)); document.body.classList.toggle('ss-ninos', ST.modo === 'ninos'); document.body.classList.toggle('ss-adultos', ST.modo !== 'ninos'); };
   pintarModo();
+  // rendimiento: sin sombras y resolución contenida mientras se simula
+  try { T3.renderer.setPixelRatio(Math.min(devicePixelRatio || 1, innerWidth < 860 ? 1 : 1.25)); if (T3.renderer.shadowMap) { T3.renderer.shadowMap.enabled = false; } if (T3.sun) T3.sun.castShadow = false; } catch (e) {}
 
-  function volar(p, d) { const cam = T3.camera, t = T3.orbit.target; const h = new THREE.Vector3(0.55, 0, 0.83).normalize(); const c1 = new THREE.Vector3(p[0], 1, p[1]), p1 = c1.clone().addScaledVector(h, d * 0.62); p1.y = d * 0.62; VUELO = { t: 0, dur: 1.8, p0: cam.position.clone(), p1, c0: t.clone(), c1 }; }
-  function abrir(k) {
-    if (ST.k === k) { cerrar(); return; }
+  function volar(p, d) { const cam = T3.camera, t = T3.orbit.target, h = new THREE.Vector3(0.55, 0, 0.83).normalize(), c1 = new THREE.Vector3(p[0], 1, p[1]), p1 = c1.clone().addScaledVector(h, d * 0.75); p1.y = d * 0.72; VUELO = { t: 0, dur: 1.8, p0: cam.position.clone(), p1, c0: t.clone(), c1 }; }
+  function abrir(k, v) {
     try { localStorage.setItem('ken-guia-v1', '1'); } catch (er) {} const sal = [...document.querySelectorAll('button.sal')].find(x => /Saltar/.test(x.textContent)); if (sal) sal.click();
-    ST.k = k; const S = sim(); ST.par = { ...S.par }; ST.ver = 'B'; ST.corre = true; ST.pertIni = -1;
-    
-    for (const [kk, E] of Object.entries(ESC)) E.g.visible = kk === k; construir(k).g.visible = true; grupo.visible = true;
-    document.body.classList.add('ss-on'); reiniciar(); volar(LUG[S.lugar], S.dist); pintar(true); marcarMenu();
+    const nuevo = ST.k !== k; ST.k = k; if (v) ST.ver = v; const S = sim();
+    if (nuevo) { ST.par = { ...S.par }; for (const [kk, E] of Object.entries(ESC)) E.g.visible = kk === k; construir(k).g.visible = true; grupo.visible = true; reiniciar(); ST.corre = true; volar(LUG[S.lugar], ST.ver === 'B' && S.distB ? S.distB : S.dist); } else if (v && S.distB) volar(LUG[S.lugar], v === 'B' ? S.distB : S.dist);
+    pintar(true);
   }
-  function cerrar() { ST.k = null; grupo.visible = false; document.body.classList.remove('ss-on'); bar.querySelectorAll('.on').forEach(b => b.classList.remove('on')); lbl.innerHTML = ''; }
   function pintar(todo) {
-    const S = sim(); if (!S) return; const e = ST.ver === 'A' ? ST.A : ST.B, a = ST.A, b = ST.B, ninos = ST.modo === 'ninos';
-    const go = e.go, bien = S.bueno(e) && !go;
+    const S = sim(); if (!S) return; const e = ST.ver === 'A' ? ST.A : ST.B, a = ST.A, b = ST.B, ninos = ST.modo === 'ninos', n = SIMS.indexOf(S) + 1;
+    top.querySelectorAll('#ss-tabs button').forEach(x => x.classList.toggle('on', x.dataset.k === ST.k));
+    sw.innerHTML = `<button data-v="A" class="${ST.ver === 'A' ? 'on' : ''}">SIMULACIÓN ${n} · SIN PROPUESTA</button><button data-v="B" class="${ST.ver === 'B' ? 'on' : ''}">SIMULACIÓN ${n} · CON PROPUESTA</button>`;
     if (todo) {
-      pan.innerHTML = `<div class="ss-h"><div class="ic">${ico(S.ic, 28)}</div><div><small>SIM ${SIMS.indexOf(S) + 1} · ${ninos ? 'modo niños' : 'modo adultos'}</small><b>${S.largo}</b></div><button class="x" data-a="cerrar" aria-label="Cerrar">${ico('cerrar', 18)}</button></div>
-        <div class="ss-txt">${S.nino}</div><div class="ss-esc">${ico('rayo', 14)}${S.escala}</div>
-        <div class="ss-ver" style="margin:0 16px 10px;padding:9px 12px;border-radius:3px;font:800 13px Manrope;letter-spacing:.03em"></div>
-        ${S.ctrl.filter(c => !(ninos && c.soloB && false)).map(c => `<div class="ss-ctrl" data-c="${c.k}"><label>${ico(c.ia, 16)}${c.n}${c.soloB ? ' <em style="color:#7d877e;font-style:normal;font-size:10.5px">(propuesta)</em>' : ''}<b></b></label><input type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${ST.par[c.k]}"></div>`).join('')}
-        <button class="ss-pert" data-a="pert">${ico('rayo', 18)}${S.pert}</button>
-        <div class="ss-tiempo"><button data-a="play" aria-label="Pausa">${ico('pausa', 18)}</button><button data-a="rein" aria-label="Reiniciar">${ico('reinicio', 18)}</button><div class="bar"><i></i></div><span></span></div>
-        <div class="ss-vivo"></div>`;
+      pan.innerHTML = `<div class="ss-h">${''}<div><small>Simulación ${n} · ${ninos ? 'modo niños' : 'modo adultos'}</small><b>${S.largo}</b></div></div>
+        <div class="ss-txt">${S.nino}</div><div class="ss-rings"></div><div class="ss-vivo"></div>
+        ${S.ctrl.map(c => `<div class="ss-ctrl" data-c="${c.k}"><label>${ico(c.ia, 15)}${c.n}<b></b></label><input type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${ST.par[c.k]}"></div>`).join('')}
+        <div class="ss-bt"><button class="ss-pert" data-a="pert">${ico('rayo', 16)}${S.pert}</button><button class="r" data-a="play" aria-label="Pausa"></button><button class="r" data-a="rein" aria-label="Reiniciar">${ico('reinicio', 16)}</button></div>
+        <div class="ss-tl"><div class="bar"><i></i></div><span></span></div><div class="ss-esc">${ico('rayo', 13)}${S.escala}</div><div class="ss-adu"></div>`;
     }
-    const vv = pan.querySelector('.ss-ver'); if (vv) { vv.textContent = 'SIMULACIÓN ' + (SIMS.indexOf(S) + 1) + ' · ' + (ST.ver === 'A' ? 'SIN PROPUESTA' : 'CON PROPUESTA'); vv.style.background = ST.ver === 'A' ? '#F4F3EF' : '#D5FF3F'; vv.style.color = '#08090C'; }
-    pan.querySelectorAll('[data-c]').forEach(c => { const cc = S.ctrl.find(q => q.k === c.dataset.c); c.style.display = cc && cc.soloB && ST.ver === 'A' ? 'none' : ''; });
-    S.ctrl.forEach(c => { const el = pan.querySelector(`[data-c="${c.k}"] b`); if (el) el.textContent = c.f(ST.par[c.k]); });
+    S.ctrl.forEach(c => { const el = pan.querySelector(`[data-c="${c.k}"]`); if (!el) return; el.querySelector('b').textContent = c.f(ST.par[c.k]); el.style.display = c.soloB && ST.ver === 'A' ? 'none' : ''; });
     pan.querySelector('[data-a="pert"]').classList.toggle('on', ST.pertOn);
-    pan.querySelector('[data-a="play"]').innerHTML = ico(ST.corre ? 'pausa' : 'play', 18);
-    pan.querySelector('.ss-tiempo .bar i').style.width = (ST.t / SEM_MAX * 100) + '%';
-    pan.querySelector('.ss-tiempo span').textContent = `año ${Math.floor(ST.t / 52) + 1} · sem ${ST.t % 52 + 1}`;
-    const vivo = pan.querySelector('.ss-vivo');
-    const res = `<div class="ss-res ${bien ? 'ok' : 'mal'}">${ico(bien ? 'ok' : 'alerta', 30)}<div>${go ? 'GAME OVER' : bien ? (ninos ? '¡Va bien!' : 'Cumple la meta de diseño') : (ninos ? 'Cuidado, va mal' : 'No cumple la meta')}<div style="font-weight:500;font-size:11.5px;opacity:.85">${ST.ver === 'A' ? 'Sin propuesta' : 'Con propuesta'}</div></div></div>`;
-    const goTxt = (n, x) => x.go ? `<div class="ss-go"><b>GAME OVER ${n}</b> · semana ${x.go.sem + 1} (año ${Math.floor(x.go.sem / 52) + 1})<br>${x.go.ind}<br>Lugar: ${x.go.lugar}</div>` : '';
-    vivo.innerHTML = res + (ninos ? `<div class="ss-k3">${S.nino3(a, b, e).map(([ic, v, t]) => `<div>${ico(ic, 22)}<b>${v}</b><span>${t}</span></div>`).join('')}</div>`
-      : `<table class="ss-tab"><thead><tr><th>Indicador</th><th style="text-align:right">Sin</th><th style="text-align:right">Con</th><th>Referencia</th></tr></thead><tbody>${S.filas(a, b).map(r => `<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n b">${r[2]}</td><td class="f">${r[3]}</td></tr>`).join('')}</tbody></table>`)
-      + goTxt('sin propuesta', a) + goTxt('con propuesta', b)
-      + (ninos ? '' : `<div class="ss-link"><b style="color:#F4F3EF">Lógica y papers</b><ul style="margin:6px 0 10px;padding-left:16px;line-height:1.45">${LOGICA[S.k].map(([q, r, u]) => `<li>${q}<br><a href="${u}" target="_blank" rel="noopener">${r} ↗</a></li>`).join('')}</ul></div><div class="ss-link">Fuentes, supuestos y decisiones de diseño de cada cifra: <a href="fuentes.html" target="_blank" rel="noopener">matriz de fuentes ↗</a></div>`);
+    pan.querySelector('[data-a="play"]').innerHTML = ico(ST.corre ? 'pausa' : 'play', 16);
+    pan.querySelector('.ss-tl .bar i').style.width = (ST.t / SEM_MAX * 100) + '%';
+    pan.querySelector('.ss-tl span').textContent = `año ${Math.floor(ST.t / 52) + 1} de 15 · semana ${ST.t % 52 + 1}`;
+    pan.querySelector('.ss-rings').innerHTML = RINGS[S.k](e, ST.par).map(([t, v, txt, malo]) => `<div>${anillo(v, malo)}<em>${txt}</em><span>${t}</span></div>`).join('');
+    const go = e.go, bien = S.bueno(e) && !go;
+    pan.querySelector('.ss-vivo').innerHTML = `<div class="ss-res ${bien ? 'ok' : 'mal'}">${ico(bien ? 'ok' : 'alerta', 26)}<div>${go ? 'GAME OVER' : bien ? (ninos ? '¡Va bien!' : 'Cumple la meta de diseño') : (ninos ? 'Cuidado: va mal' : 'No cumple la meta')}<small>${ST.ver === 'A' ? 'Sin propuesta' : 'Con propuesta'}${go ? ' · semana ' + (go.sem + 1) + ' · ' + go.ind : ''}</small></div></div>`;
+    pan.querySelector('.ss-adu').innerHTML = ninos ? '' : `<table class="ss-tab"><thead><tr><th>Indicador</th><th style="text-align:right">Sin</th><th style="text-align:right">Con</th><th>Referencia</th></tr></thead><tbody>${S.filas(a, b).map(r => `<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n b">${r[2]}</td><td class="f">${r[3]}</td></tr>`).join('')}</tbody></table>`
+      + [['sin propuesta', a], ['con propuesta', b]].filter(([, x]) => x.go).map(([nn, x]) => `<div class="ss-go"><b>GAME OVER ${nn}</b> · semana ${x.go.sem + 1} (año ${Math.floor(x.go.sem / 52) + 1})<br>${x.go.ind} · ${x.go.lugar}</div>`).join('')
+      + `<div class="ss-lg"><b>Lógica y papers</b><ul>${LOGICA[S.k].map(([q, r, u]) => `<li>${q}<br><a href="${u}" target="_blank" rel="noopener">${r} ↗</a></li>`).join('')}</ul><p style="margin:10px 0 0">Todas las cifras con su URL: <a href="fuentes.html" target="_blank" rel="noopener">matriz de fuentes ↗</a></p></div>`;
   }
-  bar.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.a === 'mas') { document.body.classList.toggle('ss-simple'); b.textContent = document.body.classList.contains('ss-simple') ? 'Herramientas avanzadas' : 'Interfaz simple'; return; } if (ST.k !== b.dataset.k) abrir(b.dataset.k); ST.ver = b.dataset.v; marcarMenu(); pintar(); });
-  document.body.classList.add('ss-simple');
-  modo.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; ST.modo = b.dataset.m; try { localStorage.setItem('ss-modo', ST.modo); } catch (er) {} pintarModo(); if (ST.k) pintar(true); });
-  pan.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.v) { ST.ver = b.dataset.v; pintar(); return; }
-    const a = b.dataset.a; if (a === 'cerrar') cerrar(); if (a === 'play') { if (ST.t >= SEM_MAX - 1) reiniciar(); ST.corre = !ST.corre; pintar(); }
+  top.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.k) abrir(b.dataset.k); if (b.dataset.m) { ST.modo = b.dataset.m; try { localStorage.setItem('ss-modo', ST.modo); } catch (er) {} pintarModo(); pintar(true); } });
+  sw.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { ST.ver = b.dataset.v; const S = sim(); if (S.distB) volar(LUG[S.lugar], ST.ver === 'B' ? S.distB : S.dist); pintar(); } });
+  pan.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const a = b.dataset.a;
+    if (a === 'play') { if (ST.t >= SEM_MAX - 1) reiniciar(); ST.corre = !ST.corre; pintar(); }
     if (a === 'rein') { reiniciar(); ST.corre = true; pintar(); }
-    if (a === 'pert') { ST.pertOn = !ST.pertOn; ST.pertIni = ST.t; ST.pertHasta = ST.pertOn ? ST.t + (ST.k === 'p1' ? ST.par.bloqDur : ST.k === 'p4' ? 52 : 26) : 0; if (ST.k === 'p1' && ST.pertOn) { ST.A.bloq = ST.B.bloq = ST.par.bloqDur; } pintar(); } });
+    if (a === 'pert') { ST.pertOn = !ST.pertOn; ST.pertHasta = ST.pertOn ? ST.t + (ST.k === 'p1' ? ST.par.bloqDur : ST.k === 'p4' ? 52 : 26) : 0; if (ST.k === 'p1') { ST.A.bloq = ST.B.bloq = ST.pertOn ? ST.par.bloqDur : 0; } pintar(); } });
   pan.addEventListener('input', e => { const c = e.target.closest('[data-c]'); if (!c) return; ST.par[c.dataset.c] = +e.target.value; pintar(); });
 
   /* ---------- bucle ---------- */
-  let ult = performance.now(), acc = 0, pintAcc = 0; const V3 = new THREE.Vector3();
+  let ult = performance.now(), acc = 0, pintAcc = 0, lblAcc = 0; const V3 = new THREE.Vector3();
   function bucle(now) {
     requestAnimationFrame(bucle); const dt = Math.min(0.1, (now - ult) / 1000); ult = now;
     if (VUELO) { T3.anim = null; const a = VUELO; a.t += dt; const u = Math.min(1, a.t / a.dur), k2 = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; T3.orbit.target.lerpVectors(a.c0, a.c1, k2); T3.camera.position.lerpVectors(a.p0, a.p1, k2); T3.camera.lookAt(T3.orbit.target); if (u >= 1) VUELO = null; }
-    if (!ST.k) return; const S = sim(), E = ESC[ST.k];
-    if (ST.corre && ST.t < SEM_MAX - 1) { acc += dt * ST.vel; while (acc >= 1) { acc -= 1; ST.t++; paso(); } }
-    if (!ST.corre) acc = 0;
+    if (!ST.k) return; const E = ESC[ST.k];
+    if (ST.corre && ST.t < SEM_MAX - 1) { acc += dt * ST.vel; while (acc >= 1) { acc -= 1; ST.t++; paso(); } } else acc = 0;
     if (ST.corre && ST.t >= SEM_MAX - 1) ST.corre = false;
     const e = ST.ver === 'A' ? ST.A : ST.B; E.actualizar(e, ST.par, ST.ver === 'B', dt, { pertOn: ST.pertOn });
-    pintAcc += dt; if (pintAcc > 0.25) { pintAcc = 0; pintar(); }
-    // etiquetas 3D
-    const w = innerWidth, h = innerHeight; let html = '';
-    for (const L of E.etiquetas) { V3.set(L.p[0], Y() + L.h, L.p[1]).project(T3.camera); if (V3.z > 1 || Math.abs(V3.x) > 1.1 || Math.abs(V3.y) > 1.1) continue; html += `<div class="ss-l" style="left:${(V3.x + 1) / 2 * w}px;top:${(1 - V3.y) / 2 * h}px">${L.html(e)}</div>`; }
+    pintAcc += dt; if (pintAcc > 0.3) { pintAcc = 0; pintar(); }
+    lblAcc += dt; if (lblAcc < 0.05) return; lblAcc = 0;
+    const w = innerWidth, h = innerHeight, cajas = []; let html = '';
+    for (const L of E.etiquetas) { if (L.solo && L.solo !== ST.ver) continue; const p = typeof L.p === 'function' ? L.p() : L.p, alto = L.alto ? L.alto(e) : L.h;
+      V3.set(p[0], Y() + alto, p[1]).project(T3.camera); if (V3.z > 1) continue; const x = (V3.x + 1) / 2 * w, y = (1 - V3.y) / 2 * h;
+      if (x < 40 || x > w - 40 || y < 215 || y > h - 30) continue; if (cajas.some(([cx, cy]) => Math.abs(cx - x) < 230 && Math.abs(cy - y) < 70)) continue; cajas.push([x, y]);
+      html += `<div class="ss-l" style="left:${x}px;top:${y}px"><div class="c">${L.html(e).replace(/<b>/, '<div><b>').replace(/<\/span>$/, '</span></div>')}</div><i></i><div class="p"></div></div>`; }
     lbl.innerHTML = html;
   }
   requestAnimationFrame(bucle);
-  const arranque = () => { if (T3.anim || T3.llegada) return setTimeout(arranque, 500); if (!ST.k) { abrir('p1'); ST.ver = 'A'; marcarMenu(); pintar(); } }; setTimeout(arranque, 1500);
-  return { abrir, cerrar, ST, grupo, ESC, T3, G, rutasHacia };
+  const arranque = () => { if (T3.anim || T3.llegada) return setTimeout(arranque, 400); if (!ST.k) abrir('p1', 'A'); };
+  setTimeout(arranque, 800);
+  return { abrir, ST, grupo, ESC, T3, G, rutasHacia };
 }
