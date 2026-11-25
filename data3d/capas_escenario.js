@@ -6,7 +6,7 @@
      (huertas de barrio, techos, Bavaria) con su área; el panel muestra hoy -> propuesta.
    · Indicadores: tabla HOY -> CON LA PROPUESTA en el panel de la derecha, con la razón de cada cambio (escenarios_sim.js).
    Al cambiar a la propuesta sale una tarjeta corta que resume qué cambió en cada capa. */
-import { SEM, AÑO, SIMST } from './sim_modelos.js?v=3';
+import { SEM, AÑO, SIMST } from './sim_modelos.js?v=4';
 export function iniciarCapasEscenario({ T3, ES }) {
   const fmt = (v, d = 0) => (v == null || !isFinite(v)) ? '–' : v.toLocaleString('es-CO', { maximumFractionDigits: d, minimumFractionDigits: d });
   const pro = () => T3.escenario === 'proyecto';

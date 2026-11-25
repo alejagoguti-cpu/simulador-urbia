@@ -8,7 +8,8 @@
    · REGLAS DE COLAPSO: fijas (REGLAS), declaradas antes de correr y las mismas para A, B y C.
    Este archivo no toca el DOM: lo usan el panel del mapa (escenarios_sim.js) y el trabajador del modo «Evaluar» (sim_vida_worker.js).
    Cada supuesto que no viene del documento está marcado [SUP]. */
-export const AÑO = 52, POB_K = 1034000;
+import { ORG_PC, DIST_DJ, REND_COMP, RIQ_BURRO, CRECE } from './sim_modelos.js?v=4';
+export const AÑO = 52, POB_K = 1037929; // ASIS Kennedy 2024 (fuentes.json)
 export const ARRANQUE = 156; // [SUP] las reglas empiezan a contar en el año 3: es el tiempo de montaje del documento (superficies en ~3 años)
 
 /* ---------- generador con semilla ---------- */
@@ -81,7 +82,7 @@ export function paso(s, PAR) {
   if (P1.bloqueo && t === 260) { s.ev.bloqueo = Math.max(s.ev.bloqueo, 30); anotar(s, 'bloqueo_f', 30); }
   if (P1.baldios && t === 300 && prop) { s.Nef *= 0.65; s.A *= 0.7; s.supF *= 0.7; anotar(s, 'baldios_f', 0.35); }
   const seco = s.ev.sequia > 0, bloq = s.ev.bloqueo > 0, pico = s.ev.pico > 0, falla = s.ev.falla > 0;
-  if (P1.crece) s.pob *= Math.pow(1.015, 1 / AÑO);
+  if (P1.crece) s.pob *= Math.pow(CRECE, 1 / AÑO);
   if (prop && s.prog && s.Nef < b.N) s.Nef = Math.min(b.N, s.Nef + b.N * 0.05 / AÑO); // [SUP] con programa se negocian lotes nuevos (5 %/año)
 
   /* ---- SIM-01 · promotores, hogares, comida ---- */
@@ -119,7 +120,7 @@ export function paso(s, PAR) {
   const dep = Math.max(0, 1 - pers / P1.zona - reg);                                                              // G3
   const pc = 3000 * (bloq ? 1.6 : 1) * (pico ? 1.3 : 1) * (1 - P1.reac * Math.min(1, pers / P1.zona) * 0.25);
   /* ---- SIM-02 · orgánicos ---- */
-  const gen = P1.zona * 0.45 * 7 * (s.pob / POB_K);
+  const gen = P1.zona * ORG_PC * 7 * (s.pob / POB_K);
   const cap0 = !prop ? 0 : e === 'B' ? P2.cap : P2.cap * 3.5;
   const oper = !prop ? 0 : s.prog ? 1 : e === 'C' ? Math.min(1, s.prom / 20) : 0.3; // [SUP] sin programa: B queda con voluntarios (30 %), en C la planta la operan los promotores
   const capEf = cap0 * oper * (falla ? (e === 'C' ? 0.3 : 0.85) : 1);
@@ -127,8 +128,8 @@ export function paso(s, PAR) {
   s.adopc = rech < 0.05 ? Math.min(1, s.adopc + 1 / 156) : Math.max(0.05, s.adopc - rech / 52); // [SUP] la separación se aprende en 3 años y se pierde si el compost rechaza
   const mad = cl(Math.round(P2.mad), 1, 60), madura = t >= mad ? s.buf[(t - mad) & 63] : 0; s.buf[t & 63] = desv;
   let pila = 0; for (let i = 0; i < mad && i <= t; i++) pila += s.buf[(t - i) & 63];
-  const sust = e === 'C' ? madura * P2.sust : e === 'B' ? madura * P2.sust * 0.3 : 0, comp = Math.max(0, madura * 0.5 - sust * 0.5), hongos = sust * 0.15;
-  const rell = gen - desv, dist = !prop ? 28 : e === 'B' ? P2.dist : 4.5;
+  const sust = e === 'C' ? madura * P2.sust : e === 'B' ? madura * P2.sust * 0.3 : 0, comp = Math.max(0, (madura - sust) * REND_COMP), hongos = sust * 0.15;
+  const rell = gen - desv, dist = !prop ? DIST_DJ : e === 'B' ? P2.dist : 4.5;
   /* ---- SIM-03 · humedal y aves ---- */
   const huertas = prop ? P3.borde * s.supF : 0, conect0 = !prop ? 0.2 : e === 'B' ? 1 - Math.exp(-P3.disp / 600) : 1 - Math.exp(-P3.disp / 250);
   const conect = prop ? conect0 * (0.4 + 0.6 * s.supF) : conect0; // [SUP] los corredores se pierden si se abandonan las huertas
@@ -139,8 +140,8 @@ export function paso(s, PAR) {
   const muere = s.B * m; s.muertes += muere; s.B = Math.max(20, s.B + 0.012 * s.B * (1 - s.B / K) - muere + conect * 1.5);
   for (const k in s.ev) if (s.ev[k] > 0) s.ev[k]--;
   Object.assign(o, { t, act: s.A, N: b.N, prom: s.prom, prod, auto, merma, exc, pers, pct: pers / s.pob * 100, dep, reg, m2p: isFinite(m2p) ? m2p : null, cal, espera, pc, carga, retiro, prog: s.prog,
-    gen, relleno: rell, desv, rech, compost: comp, vuelve: comp, hongos, pct2: comp / gen * 100 * 2, pila, km: rell / 8000 * 28 * 2 + desv / 1500 * dist * 2, ocup: cap0 ? Math.min(1.5, pila / (Math.max(capEf, cap0 * 0.1) * Math.max(1, mad) / 4)) : 0,
-    aves: s.B, riq: Math.round(42 * (0.45 + 0.35 * conect + 0.3 * s.W)), hum: s.W * 100, trampa: s.muertes, conect, seco, bloq, pico, falla });
+    gen, relleno: rell, desv, rech, compost: comp, vuelve: comp, hongos, pct2: comp / REND_COMP / gen * 100, pila, km: rell / 11500 * DIST_DJ * 2 + desv / 1500 * dist * 2, ocup: cap0 ? Math.min(1.5, pila / (Math.max(capEf, cap0 * 0.1) * Math.max(1, mad) / 4)) : 0,
+    aves: s.B, riq: Math.round(RIQ_BURRO * (0.45 + 0.35 * conect + 0.3 * s.W)), hum: s.W * 100, trampa: s.muertes, conect, seco, bloq, pico, falla });
   /* ---- reglas de colapso ---- */
   if (t >= ARRANQUE) { for (const R of REGLAS) s.racha[R.k] = R.malo(o) ? s.racha[R.k] + 1 : 0;
     if (!s.colapso) { const c = REGLAS.filter(Q => s.racha[Q.k] >= Q.sem).map(Q => Q.k); if (c.length) s.colapso = { t, causas: c }; } }

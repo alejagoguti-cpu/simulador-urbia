@@ -61,7 +61,7 @@ export function iniciarSeguir({ THREE, T3, say }) {
 body.sg-on #sg{display:block}
 #sg .t{display:flex;align-items:flex-start;gap:10px}
 #sg .t div{flex:1;min-width:0}
-#sg .cl{font:500 9.5px var(--ui-mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:var(--ui-acc-tx,#f2c995)}
+#sg .cl{font:500 9.5px var(--ui-mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:var(--ui-acc-tx,#e3ff86)}
 #sg h4{margin:3px 0 0;font:500 16px/1.2 var(--ui-sans,sans-serif)}
 #sg .x{width:26px;height:26px;border:0;border-radius:6px;background:none;color:var(--ui-tx2,#9aa2a7);font:300 18px/1 var(--ui-sans,sans-serif);cursor:pointer}
 #sg .x:hover{background:rgba(255,255,255,.06);color:var(--ui-tx,#e9ebec)}
@@ -73,7 +73,7 @@ body.sg-on #sg{display:block}
 #sg .fila{display:flex;gap:4px}
 #sg .fila button{flex:1;height:28px;border:1px solid var(--ui-bd,rgba(255,255,255,.075));border-radius:7px;background:rgba(255,255,255,.035);color:var(--ui-tx2,#9aa2a7);font:500 11px var(--ui-sans,sans-serif);cursor:pointer}
 #sg .fila button:hover{color:var(--ui-tx,#e9ebec)}
-#sg .fila button.on{background:var(--ui-acc-bg,rgba(226,165,91,.13));color:var(--ui-acc-tx,#f2c995);border-color:rgba(226,165,91,.42)}
+#sg .fila button.on{background:var(--ui-acc-bg,rgba(213,255,63,.13));color:var(--ui-acc-tx,#e3ff86);border-color:rgba(213,255,63,.42)}
 #sg .fila .sep{flex:none;width:6px;border:0;background:none}
 #sg-menu{position:fixed;z-index:14;left:50%;bottom:84px;transform:translateX(-50%);display:none;gap:4px;padding:5px;border-radius:12px;background:var(--ui-bg,rgba(13,15,18,.85));border:1px solid var(--ui-bd,rgba(255,255,255,.075));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 12px 32px rgba(0,0,0,.28)}
 #sg-menu.on{display:flex}

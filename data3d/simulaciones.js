@@ -13,16 +13,16 @@
    SIM-02 Orgánicos y compostaje: A ruta actual · B estación de compostaje barrial · C compostaje en Bavaria Común
    SIM-03 Hábitat y fauna: A sin huertas · B huertas sin criterio de ubicación · C huertas con corredores; con y sin medida antitrampa
    Los valores de partida que no da el documento están marcados [SUP] (supuestos para discutir con el grupo). */
-import { SEM, AÑO, POB_K, PAR, SIMST, avisar, sim03, correrTodo } from './sim_modelos.js?v=3';
+import { SEM, AÑO, POB_K, PAR, SIMST, avisar, sim03, correrTodo } from './sim_modelos.js?v=4';
 export function iniciarSimulaciones({ T3, tb, verPestana }) {
   const { P1, P2, P3 } = PAR; // los mismos parámetros que el panel de escenarios del mapa (data3d/sim_modelos.js)
   // colores fijos de los escenarios (los mismos en el mapa): A hoy azul grisáceo, B morado, C ámbar (la propuesta)
-  const COL = { A: '#8fb0c9', B: '#b07aa1', C: '#e2a55b' }, NOMBRE = { A: 'A · Kennedy hoy', B: 'B · Nodo central', C: 'C · Clúster rotativo' };
+  const COL = { A: '#8fb0c9', B: '#b07aa1', C: '#D5FF3F' }, NOMBRE = { A: 'A · Kennedy hoy', B: 'B · Nodo central', C: 'C · Clúster rotativo' };
   const CORTO = { A: 'Kennedy hoy', B: 'Nodo central', C: 'Clúster rotativo' };
   // qué significa cada escenario en cada simulación, en una frase
   const ESCD = {
     S1: { A: 'Nada cambia: unas pocas huertas caseras, sin apoyo.', B: 'Bavaria forma promotores y una sola oficina central decide todo.', C: 'Bavaria forma promotores y los barrios, agrupados en clústeres, se turnan las decisiones.' },
-    S2: { A: 'Los orgánicos se van en camión al relleno Doña Juana, a 28 km.', B: 'Cada barrio composta en una estación pequeña, cerca de sus huertas.', C: 'Todo se composta en la planta grande de Bavaria Común.' },
+    S2: { A: 'Los orgánicos se van en camión al relleno Doña Juana, a 16,6 km por vía.', B: 'Cada barrio composta en una estación pequeña, cerca de sus huertas.', C: 'Todo se composta en la planta grande de Bavaria Común.' },
     S3: { A: 'Sin huertas nuevas cerca del humedal.', B: 'Huertas donde haya espacio, sin pensar en las aves.', C: 'Huertas unidas por corredores verdes entre parches de hábitat.' } };
   const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const fmt = (v, d = 0) => (v == null || !isFinite(v)) ? '–' : v.toLocaleString('es-CO', { maximumFractionDigits: d, minimumFractionDigits: d });
@@ -61,26 +61,26 @@ export function iniciarSimulaciones({ T3, tb, verPestana }) {
 #tb .sim-var summary::-webkit-details-marker{display:none}#tb .sim-var summary::after{content:' +';color:var(--ui-tx3,#8e979d)}#tb .sim-var[open] summary::after{content:' –'}
 #tb .sim-var .cv{display:grid;gap:9px;padding:2px 12px 12px}
 #tb .sim-var label{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:2px 10px;align-items:center;font-size:11px;color:var(--ui-tx2,#c0c7cb)}
-#tb .sim-var label input[type=range]{grid-column:1/-1;width:100%;accent-color:#e2a55b}
+#tb .sim-var label input[type=range]{grid-column:1/-1;width:100%;accent-color:#D5FF3F}
 #tb .sim-var label output{text-align:right;font:500 11px var(--ui-mono,monospace);color:#fff}
 #tb .sim-var .chk{display:flex;flex-wrap:wrap;gap:6px}
 #tb .sim-var .chk label{display:inline-flex;gap:6px;padding:5px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.1);cursor:pointer}
 #tb .sim-play{display:flex;align-items:center;gap:8px;margin:0 0 10px}
 #tb .sim-play button{height:30px;padding:0 12px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;font:500 11.5px var(--ui-sans,Inter,sans-serif);cursor:pointer}
-#tb .sim-play input{flex:1;accent-color:#e2a55b}#tb .sim-play output{font:500 11px var(--ui-mono,monospace);color:#fff;min-width:64px;text-align:right}
-#tb .sim-frase{margin:0 0 12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-left:3px solid #e2a55b;font:400 14px/1.45 var(--ui-sans,Inter,sans-serif);color:#e9eef0}#tb .sim-frase b{color:#fff;font-weight:600}
+#tb .sim-play input{flex:1;accent-color:#D5FF3F}#tb .sim-play output{font:500 11px var(--ui-mono,monospace);color:#fff;min-width:64px;text-align:right}
+#tb .sim-frase{margin:0 0 12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-left:3px solid #D5FF3F;font:400 14px/1.45 var(--ui-sans,Inter,sans-serif);color:#e9eef0}#tb .sim-frase b{color:#fff;font-weight:600}
 #tb .sim-cmp{display:grid;gap:10px;margin:0 0 12px}
 #tb .cmp{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
 #tb .cmp .cn{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 7px;font:600 12px var(--ui-sans,Inter,sans-serif);color:#fff}
 #tb .cmp .cn em{font:600 11px var(--ui-sans,Inter,sans-serif);font-style:normal;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.08);color:#cfd5d9}
-#tb .cmp .cn em.up{background:rgba(226,165,91,.16);color:#f2c995}#tb .cmp .cn em.dn{background:rgba(255,255,255,.08);color:#b9c1c6}
+#tb .cmp .cn em.up{background:rgba(213,255,63,.16);color:#e3ff86}#tb .cmp .cn em.dn{background:rgba(255,255,255,.08);color:#b9c1c6}
 #tb .cmp .cb{display:grid;grid-template-columns:104px minmax(0,1fr) 74px;gap:8px;align-items:center;font-size:11px;color:var(--ui-tx2,#b9c1c6);margin-top:4px}
 #tb .cmp .cb i{display:block;height:10px;border-radius:5px;background:rgba(255,255,255,.05);overflow:hidden}#tb .cmp .cb i b{display:block;height:100%;border-radius:5px;transition:width .4s}
 #tb .cmp .cb strong{text-align:right;font:600 12px var(--ui-sans,Inter,sans-serif);color:#fff;font-variant-numeric:tabular-nums}
 #tb .sim-gp canvas{height:200px}
 #tb .sim-tec{margin:4px 0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02)}
 #tb .sim-tec > summary{cursor:pointer;padding:10px 12px;font:500 11.5px var(--ui-sans,Inter,sans-serif);color:var(--ui-tx2,#c0c7cb);list-style:none}#tb .sim-tec > summary::-webkit-details-marker{display:none}
-#tb .sim-tec > summary::before{content:'+ ';color:#e2a55b}#tb .sim-tec[open] > summary::before{content:'– '}
+#tb .sim-tec > summary::before{content:'+ ';color:#D5FF3F}#tb .sim-tec[open] > summary::before{content:'– '}
 #tb .sim-tec-c{padding:0 10px 4px}
 #tb .sim-nota{font-size:10px;line-height:1.45;color:var(--ui-tx3,#8e979d);margin:4px 0 6px}
 #tb .sim-h{display:flex;align-items:center;gap:8px;margin:16px 0 8px;font:600 10px var(--ui-mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:#cfd5d9}
@@ -184,11 +184,11 @@ export function iniciarSimulaciones({ T3, tb, verPestana }) {
     if (sim === 'S1') {
       const R = S.S1, r = R[e], a = R.A;
       h = cabecera('¿Cuánto baja la <b>dependencia de Corabastos</b> cuando Bavaria forma promotores, las huertas abastecen a tiendas y comedores, y cambia quién decide cómo se reparten los recursos?', ['A', 'B', 'C']) +
-        `        <div class="sim-g"><h4>G1 · Producción y destino semanal<span>kg por semana · escenario ${e}</span></h4><canvas data-c="g1"></canvas>${ley([['#e2a55b', 'Autoconsumo'], ['#a87a44', 'Excedente al acopio'], ['#5c636a', 'Merma']])}</div>
+        `        <div class="sim-g"><h4>G1 · Producción y destino semanal<span>kg por semana · escenario ${e}</span></h4><canvas data-c="g1"></canvas>${ley([['#D5FF3F', 'Autoconsumo'], ['#a87a44', 'Excedente al acopio'], ['#5c636a', 'Merma']])}</div>
         <div class="sim-g"><h4>G2 · Personas alimentadas<span>A · B · C</span></h4><canvas data-c="g2"></canvas>${ley([[COL.A, 'A sin intervención'], [COL.B, 'B nodo central'], [COL.C, 'C clúster rotativo']])}</div>
         <div class="sim-g"><h4>G3 · Dependencia de Corabastos según la zona<span>al año 10, % de dependencia</span></h4><p>Más grande la zona de servicio, más depende. Cae al 50 % en una zona de ${fmtK(2 * r.pers[SEM - 1])} habitantes.</p><canvas data-c="g3"></canvas>${ley([[COL.A, 'A'], [COL.B, 'B'], [COL.C, 'C']])}</div>
         <div class="sim-g"><h4>G4 · Difusión de huertas (curva de Bass)<span>hogares activos</span></h4><canvas data-c="g4"></canvas>${ley([[COL.A, 'A'], [COL.B, 'B (techo 2.506)'], [COL.C, 'C (techo 5.400)']])}</div>
-        <div class="sim-g"><h4>G5 · Saturación del acompañamiento<span>m² por promotor · escenario ${e}</span></h4><p>Por encima de ${fmt(P1.c)} m² por promotor baja la calidad de manejo y suben los cierres.</p><canvas data-c="g5"></canvas>${ley([[COL[e === 'A' ? 'C' : e], 'm² por promotor'], ['#e2a55b', 'Capacidad c', true]])}</div>
+        <div class="sim-g"><h4>G5 · Saturación del acompañamiento<span>m² por promotor · escenario ${e}</span></h4><p>Por encima de ${fmt(P1.c)} m² por promotor baja la calidad de manejo y suben los cierres.</p><canvas data-c="g5"></canvas>${ley([[COL[e === 'A' ? 'C' : e], 'm² por promotor'], ['#D5FF3F', 'Capacidad c', true]])}</div>
         <div class="sim-g"><h4>G6 · Cola y tiempo de decisión<span>semanas de espera</span></h4><p>B: una institución central decide. C: asambleas rotativas (más capacidad, con pérdida por relevo).</p><canvas data-c="g6"></canvas>${ley([[COL.B, 'B decisión central'], [COL.C, 'C decisión rotativa']])}</div>
         <details class="sim-var"><summary>Variables (sliders) y estreses</summary><div class="cv">
           ${slider(P1, 'rend', 'Rendimiento (kg/m²·año)', 1, 12, 1)}${slider(P1, 'alcance', 'Alcance sobre lotes y techos', 0.1, 1, 0.05, v => fmt(v * 100) + ' %')}
@@ -199,11 +199,11 @@ export function iniciarSimulaciones({ T3, tb, verPestana }) {
           ${slider(P1, 'mu', 'Capacidad de decisión central (solicitudes/semana)', 1, 20, 1)}${slider(P1, 'zona', 'Población de la zona de servicio', 10000, 300000, 5000, v => fmtK(v))}
           ${slider(P1, 'sup', 'Huertas de la propuesta: parques, techos y Bavaria (m²)', 0, 200000, 5000, v => fmtK(v))}${slider(P1, 'regional', 'Compras directas a productores de la región', 0, 0.8, 0.05, v => fmt(v * 100) + ' %')}
           <div class="chk">${[['sequia', 'Sequía (años 3-4)'], ['bloqueo', 'Bloqueo del mayorista (año 6)'], ['crece', 'Crecimiento poblacional'], ['baldios', 'Revocación de baldíos (año 6)']].map(([k, n]) => `<label><input type="checkbox" data-b="${k}" ${P1[k] ? 'checked' : ''}>${n}</label>`).join('')}</div>
-          <p class="sim-nota">Fórmulas del documento (G1-G6). [SUP]: A parte de 120 hogares sin apoyo; población de Kennedy 1.034.000; 400 g/día de frutas y verduras por persona; 10 % de pérdida en huerta.</p></div></details>`;
+          <p class="sim-nota">Fórmulas del documento (G1-G6). [SUP]: A parte de 120 hogares sin apoyo; población de Kennedy 1.037.929 (ASIS 2024); 400 g/día de frutas y verduras por persona; 10 % de pérdida en huerta.</p></div></details>`;
     } else if (sim === 'S2') {
       const R = S.S2, r = R[e], a = R.A, año = (arr) => arr.slice(Math.max(0, t - 51), t + 1).reduce((s, v) => s + v, 0);
       h = cabecera('¿Cuánta <b>materia orgánica vuelve al suelo</b> en vez de salir del barrio?', ['A', 'B', 'C']) +
-        `        <div class="sim-g"><h4>Destino de los orgánicos<span>kg por semana · escenario ${e}</span></h4><canvas data-c="o1"></canvas>${ley([['#5c636a', 'Al relleno (Doña Juana)'], ['#e2a55b', 'Compost que vuelve al suelo'], ['#c9b08a', 'Hongos (proteína)']])}</div>
+        `        <div class="sim-g"><h4>Destino de los orgánicos<span>kg por semana · escenario ${e}</span></h4><canvas data-c="o1"></canvas>${ley([['#5c636a', 'Al relleno (Doña Juana)'], ['#D5FF3F', 'Compost que vuelve al suelo'], ['#c9b08a', 'Hongos (proteína)']])}</div>
         <div class="sim-g"><h4>% de los orgánicos que vuelve al suelo<span>A · B · C</span></h4><canvas data-c="o2"></canvas>${ley([[COL.A, 'A ruta actual'], [COL.B, 'B estación barrial'], [COL.C, 'C Bavaria Común']])}</div>
         <div class="sim-g"><h4>Material en maduración<span>kg en las pilas</span></h4><canvas data-c="o3"></canvas>${ley([[COL.B, 'B'], [COL.C, 'C']])}</div>
         <div class="sim-g"><h4>Kilómetros de transporte<span>km por semana</span></h4><canvas data-c="o4"></canvas>${ley([[COL.A, 'A'], [COL.B, 'B'], [COL.C, 'C']])}</div>
@@ -211,7 +211,7 @@ export function iniciarSimulaciones({ T3, tb, verPestana }) {
           ${slider(P2, 'frac', 'Fracción desviada', 0.05, 0.9, 0.05, v => fmt(v * 100) + ' %')}${slider(P2, 'cap', 'Capacidad de la estación (kg/semana)', 1000, 30000, 500, v => fmt(v))}
           ${slider(P2, 'mad', 'Semanas de maduración', 4, 24, 1)}${slider(P2, 'sust', 'Fracción de sustrato al distrito', 0, 0.6, 0.05, v => fmt(v * 100) + ' %')}
           ${slider(P2, 'dist', 'Distancia estación – huertas (km)', 0.2, 6, 0.1, v => fmt(v, 1))}
-          <p class="sim-nota">[SUP] 0,45 kg/día de orgánicos por persona en la zona de servicio (de SIM-01); el compost pesa la mitad del material que entra; Bavaria procesa 3,5 veces la capacidad de una estación; Doña Juana a ~28 km.</p></div></details>`;
+          <p class="sim-nota">0,55 kg/día de orgánicos por persona (1,1 kg PPC × 50 % orgánico, fuentes.json) en la zona de servicio (de SIM-01); el compost pesa el 23 % del material que entra (plazas distritales de Bogotá); Bavaria procesa 3,5 veces la capacidad de una estación; Doña Juana a ~28 km.</p></div></details>`;
     } else {
       const R = S.S3, r = R[e], a = R.A;
       h = cabecera('¿Dónde y con qué especies las huertas <b>ayudan al hábitat</b> y dónde crean <b>trampas ecológicas</b>?', ['A', 'B', 'C']) +
@@ -311,16 +311,16 @@ export function iniciarSimulaciones({ T3, tb, verPestana }) {
     if (!cont.querySelector('.sim-tec') || !cont.querySelector('.sim-tec').open) return; // lo técnico solo se dibuja abierto
     const e = escAct(), c = (k) => cont.querySelector(`canvas[data-c="${k}"]`), kg = (v) => fmtK(v), pct = (v) => fmt(v, 1) + ' %';
     if (sim === 'S1') { const R = S.S1, r = R[e];
-      grafica(c('g1'), { apilar: true, series: [{ name: 'Autoconsumo', color: '#e2a55b', data: r.auto }, { name: 'Excedente', color: '#a87a44', data: r.exc }, { name: 'Merma', color: '#5c636a', data: r.merma }], yfmt: kg });
+      grafica(c('g1'), { apilar: true, series: [{ name: 'Autoconsumo', color: '#D5FF3F', data: r.auto }, { name: 'Excedente', color: '#a87a44', data: r.exc }, { name: 'Merma', color: '#5c636a', data: r.merma }], yfmt: kg });
       grafica(c('g2'), { series: ['A', 'B', 'C'].map(k => ({ name: NOMBRE[k], corto: k, color: COL[k], data: R[k].pers, w: k === e ? 2.6 : 1.5, alfa: k === e ? 1 : 0.55 })), fin: true, yfmt: kg });
       const zs = Array.from({ length: 61 }, (_, i) => 5000 + i * 5000), xz = (i) => 40 + i / 60 * ((c('g3').clientWidth || 400) - 48);
       grafica(c('g3'), { x: xz, series: ['A', 'B', 'C'].map(k => ({ name: NOMBRE[k], corto: k, color: COL[k], data: zs.map(z => Math.max(0, 1 - R[k].pers[SEM - 1] / z) * 100), w: k === e ? 2.6 : 1.5, alfa: k === e ? 1 : 0.55 })), fin: true, y: { max: 100 }, yfmt: (v) => fmt(v) + ' %' });
       grafica(c('g4'), { series: ['A', 'B', 'C'].map(k => ({ name: NOMBRE[k], corto: k, color: COL[k], data: R[k].act, w: k === e ? 2.6 : 1.5, alfa: k === e ? 1 : 0.55 })), fin: true, yfmt: (v) => fmt(v) });
-      const k5 = e === 'A' ? 'C' : e; grafica(c('g5'), { series: [{ name: 'm² por promotor', color: COL[k5], data: R[k5].m2p }, { name: 'Capacidad c', color: '#e2a55b', data: R[k5].m2p.map(() => P1.c), dash: [4, 3], w: 1.5 }], yfmt: (v) => fmt(v) + ' m²' });
+      const k5 = e === 'A' ? 'C' : e; grafica(c('g5'), { series: [{ name: 'm² por promotor', color: COL[k5], data: R[k5].m2p }, { name: 'Capacidad c', color: '#D5FF3F', data: R[k5].m2p.map(() => P1.c), dash: [4, 3], w: 1.5 }], yfmt: (v) => fmt(v) + ' m²' });
       grafica(c('g6'), { series: [{ name: 'B central', color: COL.B, data: R.B.espera }, { name: 'C rotativa', color: COL.C, data: R.C.espera }], yfmt: (v) => fmt(v, 1) + ' sem' });
       for (const k of ['g1', 'g2', 'g4', 'g5', 'g6']) hover(c(k), semLabel); hover(c('g3'), (i) => `Zona de ${fmtK(zs[i])} habitantes`);
     } else if (sim === 'S2') { const R = S.S2, r = R[e];
-      grafica(c('o1'), { apilar: true, series: [{ name: 'Relleno', color: '#5c636a', data: r.relleno }, { name: 'Compost', color: '#e2a55b', data: r.compost }, { name: 'Hongos', color: '#c9b08a', data: r.hongos }], yfmt: kg });
+      grafica(c('o1'), { apilar: true, series: [{ name: 'Relleno', color: '#5c636a', data: r.relleno }, { name: 'Compost', color: '#D5FF3F', data: r.compost }, { name: 'Hongos', color: '#c9b08a', data: r.hongos }], yfmt: kg });
       grafica(c('o2'), { series: ['A', 'B', 'C'].map(k => ({ name: NOMBRE[k], corto: k, color: COL[k], data: R[k].pct, w: k === e ? 2.6 : 1.5, alfa: k === e ? 1 : 0.55 })), fin: true, yfmt: pct });
       grafica(c('o3'), { series: ['B', 'C'].map(k => ({ name: NOMBRE[k], corto: k, color: COL[k], data: R[k].pila })), yfmt: kg });
       grafica(c('o4'), { series: ['A', 'B', 'C'].map(k => ({ name: NOMBRE[k], corto: k, color: COL[k], data: R[k].km, w: k === e ? 2.6 : 1.5, alfa: k === e ? 1 : 0.55 })), fin: true, yfmt: (v) => fmt(v) + ' km' });

@@ -8,10 +8,10 @@
              con partículas proporcionales a los kilos y la ocupación de cada estación
    · SIM-03  aves -> fracción de aves visibles en la red biótica (T3.bio.ESTADO.fauna); integridad del humedal -> anillo de El Burro;
              trampas ecológicas (luz y vidrio) -> huertas del borde en rojo si no hay medida antitrampa */
-import { SEM, AÑO, PAR, SIMST, avisar, correrTodo } from './sim_modelos.js?v=3';
+import { SEM, AÑO, PAR, SIMST, avisar, correrTodo } from './sim_modelos.js?v=4';
 /* SIMULACIÓN SIN FIN (data3d/sim_vida.js): el mapa ya no muestra 10 años precalculados. A, B y C avanzan semana a semana desde su estado,
    con perturbaciones al azar (semilla = SIMST.semilla) y reglas de colapso fijas. La corrida del mapa es la réplica «semilla N» del modo Evaluar. */
-import { crear as crearVida, paso as pasoVida, diagnostico, tendencia, REGLAS, NOMBRE_EV, ARRANQUE } from './sim_vida.js?v=1';
+import { crear as crearVida, paso as pasoVida, diagnostico, tendencia, REGLAS, NOMBRE_EV, ARRANQUE } from './sim_vida.js?v=2';
 export async function iniciarEscenariosSim({ T3, cj }) {
   const THREE = T3.THREE, MOV = innerWidth < 760, RMQ = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const HB = await cj('data3d/huertas_barrio.json?v=3').catch(() => ({ huertas: [] }));
@@ -67,7 +67,7 @@ export async function iniciarEscenariosSim({ T3, cj }) {
   gp.setAttribute('position', new THREE.BufferAttribute(PP, 3)); gp.setAttribute('color', new THREE.BufferAttribute(PC, 3));
   const puntos = new THREE.Points(gp, new THREE.PointsMaterial({ size: MOV ? 5 : 6, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false, toneMapped: false })); puntos.renderOrder = 11; puntos.visible = false; // (los puntos que viajaban confundían: el cambio de los residuos se lee en las etiquetas)
   const PART = Array.from({ length: NP }, (_, i) => ({ r: 'rell', k: i % Math.max(1, EST.length), f: Math.random(), on: false }));
-  const COLR = { rell: new THREE.Color('#9aa1a6'), est: new THREE.Color('#c8a26a'), bav: new THREE.Color('#e2a55b') };
+  const COLR = { rell: new THREE.Color('#9aa1a6'), est: new THREE.Color('#c8a26a'), bav: new THREE.Color('#D5FF3F') };
   // trampas ecológicas: huertas del borde del humedal en rojo (luz y vidrio sin medida antitrampa)
   /* ---------- CAPA DE CAMBIOS: se lee desde lejos (los cambios reales miden metros y desde 1 km no se verían) ----------
      · cada huerta abierta = punto verde con halo que nunca baja de ~9 px (parques y lotes en el orden en que se abren, Bavaria y colegios)
@@ -143,7 +143,7 @@ export async function iniciarEscenariosSim({ T3, cj }) {
   const css = document.createElement('style'); css.textContent = `
 .es-et{position:fixed;left:0;top:0;z-index:5;pointer-events:none;display:none;padding:6px 10px;border-radius:10px;font:400 11px/1.3 var(--ui-sans,Inter,system-ui,sans-serif);color:#eef1f2;white-space:nowrap;
   background:var(--ui-glass,rgba(14,16,20,.6));border:1px solid var(--ui-glass-bd,rgba(255,255,255,.16));backdrop-filter:blur(14px) saturate(1.6);-webkit-backdrop-filter:blur(14px) saturate(1.6);font-variant-numeric:tabular-nums}
-.es-et b{display:block;font-weight:600;font-size:11.5px}.es-et i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.es-et em{font-style:normal;color:#f2c995}
+.es-et b{display:block;font-weight:600;font-size:11.5px}.es-et i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.es-et em{font-style:normal;color:#e3ff86}
 #esim{position:fixed;right:16px;bottom:86px;z-index:8;width:330px;max-height:calc(100vh - 470px);min-height:150px;display:flex;flex-direction:column;border-radius:18px;overflow:hidden;color:#e9ecee;
   font:400 12px/1.4 var(--ui-sans,Inter,system-ui,sans-serif);background:var(--ui-glass,rgba(14,16,20,.62));border:1px solid var(--ui-glass-bd,rgba(255,255,255,.16));box-shadow:var(--ui-glass-sh,0 20px 40px rgba(0,0,0,.3));
   backdrop-filter:var(--ui-glass-fx,blur(24px) saturate(1.8));-webkit-backdrop-filter:var(--ui-glass-fx,blur(24px) saturate(1.8))}
@@ -154,21 +154,21 @@ export async function iniciarEscenariosSim({ T3, cj }) {
 #esim .seg button{all:unset;cursor:pointer;text-align:center;padding:6px 4px;border-radius:8px;color:#b3bbc0;font-size:11px;line-height:1.2}#esim .seg button b{display:block;font-size:12px;color:#e9ecee;font-weight:600}
 #esim .seg button[aria-pressed=true]{background:color-mix(in srgb,var(--c) 22%,transparent);box-shadow:inset 0 0 0 1px var(--c);color:#fff}
 #esim .seg button b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--c)}
-#esim .tl{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}#esim .tl button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e2a55b;color:#1a1208;font-size:12px;flex:none}
-#esim .tl input{flex:1;accent-color:#e2a55b;min-width:0}#esim .tl output{width:58px;text-align:right;font-variant-numeric:tabular-nums;color:#d5dadd;font-size:11px}
+#esim .tl{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}#esim .tl button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#D5FF3F;color:#1a1208;font-size:12px;flex:none}
+#esim .tl input{flex:1;accent-color:#D5FF3F;min-width:0}#esim .tl output{width:58px;text-align:right;font-variant-numeric:tabular-nums;color:#d5dadd;font-size:11px}
 #esim .cuerpo{overflow:auto;padding:2px 12px 12px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}
 #esim ul{list-style:none;margin:4px 0 8px;padding:0;display:grid;gap:4px}#esim li{display:grid;grid-template-columns:1fr auto;gap:0 8px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.04)}
 #esim li span{color:#c3cace;font-size:11px}#esim li strong{font-weight:600;font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}#esim li small{grid-column:1/-1;color:#949da3;font-size:10.5px}
-#esim li small em{font-style:normal;color:#f2c995}
+#esim li small em{font-style:normal;color:#e3ff86}
 #esim details{margin-top:6px;border-top:1px solid rgba(255,255,255,.08);padding-top:6px}#esim summary{cursor:pointer;font-weight:600;font-size:11.5px;padding:4px 0;color:#dfe4e6}
 #esim label{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin:7px 0;font-size:11px;color:#c3cace}#esim label output{color:#fff;font-variant-numeric:tabular-nums}
-#esim label input[type=range]{grid-column:1/-1;width:100%;accent-color:#e2a55b}#esim .chk label{display:flex;gap:6px;align-items:center;margin:5px 0}#esim .chk input{accent-color:#e2a55b}
+#esim label input[type=range]{grid-column:1/-1;width:100%;accent-color:#D5FF3F}#esim .chk label{display:flex;gap:6px;align-items:center;margin:5px 0}#esim .chk input{accent-color:#D5FF3F}
 #esim .nota{color:#8d969b;font-size:10.5px;margin:6px 0 0}#esim .ir{all:unset;cursor:pointer;display:block;text-align:center;margin-top:10px;padding:8px;border-radius:9px;background:rgba(255,255,255,.07);font-weight:500}
 #esim .ir:hover{background:rgba(255,255,255,.12)}
 #esim.min .cuerpo,#esim.min .exp{display:none}#esim.min{min-height:0}
 #esim .exp{margin:0 14px 8px;font-size:11px;line-height:1.45;color:#c3cace}#esim .ley2 i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-#esim li button{all:unset;cursor:pointer;grid-column:1/-1;justify-self:start;margin-top:4px;font-size:10.5px;font-weight:600;color:#f2c995}#esim li button:hover{text-decoration:underline}#esim li button:focus-visible{outline:2px solid #fff;outline-offset:2px}
-#esim .aviso{margin:6px 12px 0;padding:8px 10px;border-radius:10px;background:rgba(226,165,91,.14);border:1px solid rgba(226,165,91,.35);font-size:11px;line-height:1.4;color:#f3e3cc;display:flex;gap:8px;align-items:center}
+#esim li button{all:unset;cursor:pointer;grid-column:1/-1;justify-self:start;margin-top:4px;font-size:10.5px;font-weight:600;color:#e3ff86}#esim li button:hover{text-decoration:underline}#esim li button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#esim .aviso{margin:6px 12px 0;padding:8px 10px;border-radius:10px;background:rgba(213,255,63,.14);border:1px solid rgba(213,255,63,.35);font-size:11px;line-height:1.4;color:#f3e3cc;display:flex;gap:8px;align-items:center}
 #esim .aviso[hidden]{display:none}#esim .aviso span{flex:1}#esim .aviso button{all:unset;cursor:pointer;font-weight:600;color:#fff;padding:4px 8px;border-radius:7px;background:rgba(255,255,255,.12);white-space:nowrap}
 #esim .tl .yr{font-size:10px;color:#949da3;display:block;text-align:right}
 body.tb-abierto #esim{display:none}
@@ -184,7 +184,7 @@ body.tb-abierto #esim{display:none}
 #esim .vida b{color:#fff;font-weight:600}#esim .vida small{display:block;color:#a7b0b5;font-size:10.5px}
 #esim .vctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 12px 0;font-size:11px;color:#a7b0b5}
 #esim .vctl>button{all:unset;cursor:pointer;padding:4px 9px;border-radius:8px;background:rgba(255,255,255,.08);color:#e9ecee;font-weight:500}#esim .vctl>button:hover{background:rgba(255,255,255,.14)}
-#esim .vctl>button[data-eval]{background:rgba(226,165,91,.2);box-shadow:inset 0 0 0 1px rgba(226,165,91,.5)}
+#esim .vctl>button[data-eval]{background:rgba(213,255,63,.2);box-shadow:inset 0 0 0 1px rgba(213,255,63,.5)}
 #esim .vctl .sem{display:inline-flex;align-items:center;gap:4px;margin-right:auto}#esim .vctl .sem button{all:unset;cursor:pointer;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:rgba(255,255,255,.08);color:#e9ecee}
 #esim .vctl .sem b{min-width:18px;text-align:center;color:#fff;font-variant-numeric:tabular-nums}
 #esim .vctl button:focus-visible{outline:2px solid #fff;outline-offset:1px}
@@ -192,7 +192,7 @@ body.tb-abierto #esim{display:none}
 #esim .reglas .rg{display:grid;grid-template-columns:1fr auto;gap:1px 8px;padding:5px 8px;margin:3px 0;border-radius:8px;background:rgba(255,255,255,.04);font-size:11px;color:#c3cace}
 #esim .reglas .rg b{color:#fff;font-weight:600}#esim .reglas .rg strong{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}#esim .reglas .rg small{grid-column:1/-1;color:#8d969b;font-size:10.5px}
 #esim .reglas .rg i{grid-column:1/-1;display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}#esim .reglas .rg i u{display:block;height:100%;background:#ff8a80}
-#esim .reglas .rg.ok strong{color:#8fd18a}#esim .reglas .rg.cerca strong{color:#f2c995}#esim .reglas .rg.mal strong{color:#ff8a80}
+#esim .reglas .rg.ok strong{color:#8fd18a}#esim .reglas .rg.cerca strong{color:#e3ff86}#esim .reglas .rg.mal strong{color:#ff8a80}
 #esim .reglas canvas{display:block;width:100%;height:56px;margin:6px 0 2px}
 #esim .senales{font-size:11px;color:#c3cace}#esim .senales p{margin:3px 0}#esim .senales b{color:#fff;font-weight:600}
 #esim.min .vctl,#esim.min .como{display:none}
@@ -211,7 +211,7 @@ body.tb-abierto #esim{display:none}
   el.innerHTML = `<div class="cab"><b>Escenarios · simulación sin fin</b><button type="button" data-guia aria-label="Cómo se usa" title="Cómo se usa">?</button><button type="button" data-min aria-label="Plegar" title="Plegar">–</button></div>
 <p class="exp">Escoge un escenario y dale ▶: corre año tras año, sin final, con sequías, bloqueos y recortes que llegan al azar. Las reglas de colapso están fijas antes de correr: mira si la propuesta se sostiene y cuándo se cae.</p>
 <p class="exp ley2"><i style="background:#8fd18a"></i>cada punto verde fijo en el mapa es una huerta abierta (se cierran si la red se cae)</p>
-<div class="seg" role="group" aria-label="Escenario"><button type="button" data-e="A" style="--c:#8fb0c9"><b>A</b>Kennedy hoy</button><button type="button" data-e="B" style="--c:#b07aa1"><b>B</b>Nodo central</button><button type="button" data-e="C" style="--c:#e2a55b"><b>C</b>Clúster rotativo</button></div>
+<div class="seg" role="group" aria-label="Escenario"><button type="button" data-e="A" style="--c:#8fb0c9"><b>A</b>Kennedy hoy</button><button type="button" data-e="B" style="--c:#b07aa1"><b>B</b>Nodo central</button><button type="button" data-e="C" style="--c:#D5FF3F"><b>C</b>Clúster rotativo</button></div>
 <div class="tl"><button type="button" data-play aria-label="Correr o pausar">▶</button><button type="button" class="vel" data-vel aria-label="Velocidad" title="Velocidad">×1</button><input type="range" min="0" max="${SEM - 1}" value="${Math.floor(SIMST.t)}" data-t aria-label="Semana de la simulación"><output data-año></output></div>
 <div class="vida" data-vida aria-live="polite"></div>
 <div class="vctl"><span class="sem">Semilla<button type="button" data-sd="-1" aria-label="Semilla anterior">‹</button><b data-seed>${VIDA.seed}</b><button type="button" data-sd="1" aria-label="Semilla siguiente">›</button></span><button type="button" data-eval>Evaluar 30 corridas</button><button type="button" data-como aria-expanded="false">Cómo funciona</button></div>
@@ -321,13 +321,13 @@ ${slider(P3, 'luz', 'Intensidad de luz y vidrio', 0, 1, 0.05, FMT.luz)}${slider(
     const año = Math.floor(t / AÑO) + 1, dg = diagnostico(sv);
     ET.cora.innerHTML = `<b><i style="background:${aCor.material.color.getStyle()}"></i>Corabastos</b>Dependencia ${fmt(dep * 100)} %${e === 'A' ? '' : ` · <em>vías ${al && al.hoy > 0.5 ? '−' + fmt((1 - al.pro / al.hoy) * 100) + ' % carros' : 'con menos carros'}</em>`}`;
     ET.hum.innerHTML = `<b><i style="background:${aHum.material.color.getStyle()}"></i>Humedal El Burro</b>Integridad ${fmt(hum * 100)} % · ${fmt(o.aves)} aves${nTr ? ` · <em style="color:#ff8a80">${nTr} huertas-trampa</em>` : ''}`;
-    ET.bav.innerHTML = e === 'A' ? `<b><i style="background:#9aa1a6"></i>Bavaria</b>Sin intervención` : `<b><i style="background:${dg.estado === 'colapso' ? '#ff8a80' : '#e2a55b'}"></i>Bavaria Común</b>${fmt(o.prom)} promotores activos · ${fmt(o.act)} hogares con huerta${dg.estado === 'colapso' ? `<br><em style="color:#ff8a80">la red colapsó en el año ${fmt(sv.colapso.t / AÑO + 1)}</em>` : o.prog ? '' : '<br><em>programa de formación cortado</em>'}`;
-    ET.comp.innerHTML = e === 'B' ? `<b><i style="background:#c8a26a"></i>Estaciones de compost (${EST.length})</b>Ocupación ${fmt(o.ocup * 100)} %` : e === 'C' ? `<b><i style="background:#e2a55b"></i>Planta de compost · Bavaria</b>${fmt(o.desv / 1000, 1)} t/semana · ${fmt(o.hongos)} kg de hongos` : '';
+    ET.bav.innerHTML = e === 'A' ? `<b><i style="background:#9aa1a6"></i>Bavaria</b>Sin intervención` : `<b><i style="background:${dg.estado === 'colapso' ? '#ff8a80' : '#D5FF3F'}"></i>Bavaria Común</b>${fmt(o.prom)} promotores activos · ${fmt(o.act)} hogares con huerta${dg.estado === 'colapso' ? `<br><em style="color:#ff8a80">la red colapsó en el año ${fmt(sv.colapso.t / AÑO + 1)}</em>` : o.prog ? '' : '<br><em>programa de formación cortado</em>'}`;
+    ET.comp.innerHTML = e === 'B' ? `<b><i style="background:#c8a26a"></i>Estaciones de compost (${EST.length})</b>Ocupación ${fmt(o.ocup * 100)} %` : e === 'C' ? `<b><i style="background:#D5FF3F"></i>Planta de compost · Bavaria</b>${fmt(o.desv / 1000, 1)} t/semana · ${fmt(o.hongos)} kg de hongos` : '';
     ET.dj.innerHTML = `<b><i style="background:#9aa1a6"></i>Al relleno Doña Juana</b>${fmt(o.relleno / 1000, 1)} t/semana · ${fmtK(o.km)} km de camión`;
     const pctTr = Math.round(kTr * 100), cTr = colorTr(kTr).getStyle();
     ET.via.innerHTML = `<b><i style="background:${cTr}"></i>Av. Ciudad de Cali · tráfico ${nivelTr(kTr)}</b>${e === 'A' ? 'como hoy: todo el abastecimiento pasa hacia Corabastos' : `<em>${pctTr} % de los vehículos de hoy</em> (−${100 - pctTr} %)`}`;
     // «lo que ves en el mapa»: cada cosa que cambia, con su color, su número y un botón para ir
-    { const nH = ab ? ab.abiertas : (e === 'A' ? 0 : null), COLE = { A: '#8fb0c9', B: '#b07aa1', C: '#e2a55b' }, NE = { A: 'Kennedy hoy', B: 'Nodo central', C: 'Clúster rotativo' };
+    { const nH = ab ? ab.abiertas : (e === 'A' ? 0 : null), COLE = { A: '#8fb0c9', B: '#b07aa1', C: '#D5FF3F' }, NE = { A: 'Kennedy hoy', B: 'Nodo central', C: 'Clúster rotativo' };
       $('[data-mapa]').innerHTML = `<h5 style="--c:${COLE[e]}">Lo que ves en el mapa<span>${e} · ${NE[e]}</span></h5>
       <button type="button" data-ir="trafico"><i class="sw b" style="height:${(4 + 6 * kTr).toFixed(0)}px;background:${cTr}"></i><span>Franja sobre la <b>Av. Ciudad de Cali</b>: tráfico <b>${nivelTr(kTr)}</b> · ${e === 'A' ? '100 % (hoy)' : `${pctTr} % del de hoy`}</span></button>
       <button type="button" data-ir="huertas"><i class="sw p" style="background:#6fcf6a"></i><span>${e === 'A' ? '<b>Sin huertas nuevas</b>: solo las que ya hay en casas' : `Puntos verdes: <b>${nH != null ? fmt(nH) : '…'} huertas abiertas</b> · ${fmt(o.act)} hogares`}</span></button>
@@ -360,7 +360,7 @@ ${slider(P3, 'luz', 'Intensidad de luz y vidrio', 0, 1, 0.05, FMT.luz)}${slider(
     const o = sv.o, box = $('[data-vida]'); let c, h;
     if (dg.estado === 'colapso') { c = '#ff8a80'; h = `<b>${LETRA[e]} · colapsó en el año ${añoDe(sv.colapso.t)}</b> por ${sv.colapso.causas.map(k => NREG[k]).join(', ')}.<small>La simulación sigue corriendo: en el mapa ${sv.colapso.causas.map(k => QUE[k]).join(', ')}.</small>`; }
     else if (dg.antes) { c = '#8fb0c9'; h = `<b>${LETRA[e]} · montaje, año ${añoDe(t)} de 3</b><small>Las reglas de colapso empiezan a contar en el año 3, cuando la propuesta ya está montada.</small>`; }
-    else if (dg.estado === 'riesgo') { const rs = dg.riesgos.slice().sort((a, b) => (b.racha / b.R.sem) - (a.racha / a.R.sem)), r = rs[0]; c = '#f2c995';
+    else if (dg.estado === 'riesgo') { const rs = dg.riesgos.slice().sort((a, b) => (b.racha / b.R.sem) - (a.racha / a.R.sem)), r = rs[0]; c = '#e3ff86';
       h = `<b>${LETRA[e]} · en riesgo: ${r.R.n.toLowerCase()}</b> ${VT[r.R.k](r.v)} (límite ${UT[r.R.k]})<small>${r.racha ? `lleva ${r.racha} de ${r.R.sem} semanas seguidas: colapsa en ${r.faltan} semanas si no se recupera` : 'cerca del límite, todavía sin cumplir la regla'}${rs.length > 1 ? ` · también cerca: ${rs.slice(1).map(x => x.R.n.toLowerCase()).join(', ')}` : ''}</small>`; }
     else { c = '#59a14f'; const tr = tendencia(sv); h = `<b>${LETRA[e]} · funcionando, año ${añoDe(t)}</b><small>Ninguna regla de colapso se cumple${tr ? ` · hogares con huerta ${tr.pctAño >= 0 ? '+' : '−'}${fmt(Math.abs(tr.pctAño), 1)} %/año` : ''}.</small>`; }
     box.style.setProperty('--c', c); box.innerHTML = h;
@@ -382,7 +382,7 @@ ${slider(P3, 'luz', 'Intensidad de luz y vidrio', 0, 1, 0.05, FMT.luz)}${slider(
     let max = 600; for (const v of H.act) if (v > max) max = v; const tMax = Math.max(H.t[n - 1], AÑO * 10), X = (w) => 2 + (W - 4) * w / tMax, Yp = (v) => Hh - 10 - (Hh - 16) * v / max;
     g.strokeStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.moveTo(X(ARRANQUE), 4); g.lineTo(X(ARRANQUE), Hh - 10); g.stroke();
     g.strokeStyle = '#ff8a80'; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(2, Yp(500)); g.lineTo(W - 2, Yp(500)); g.stroke(); g.setLineDash([]);
-    g.strokeStyle = { A: '#8fb0c9', B: '#b07aa1', C: '#e2a55b' }[e]; g.lineWidth = 1.8; g.beginPath(); for (let i = 0; i < n; i++) { const x = X(H.t[i]), y = Yp(H.act[i]); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+    g.strokeStyle = { A: '#8fb0c9', B: '#b07aa1', C: '#D5FF3F' }[e]; g.lineWidth = 1.8; g.beginPath(); for (let i = 0; i < n; i++) { const x = X(H.t[i]), y = Yp(H.act[i]); i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
     if (sv.colapso) { const x = X(sv.colapso.t); g.strokeStyle = '#ff8a80'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, 4); g.lineTo(x, Hh - 10); g.stroke(); }
     g.fillStyle = '#8d969b'; g.font = '9.5px system-ui, sans-serif'; g.textAlign = 'left'; g.fillText('hogares con huerta · umbral 500', 4, Hh - 1); g.textAlign = 'right'; g.fillText(`año ${añoDe(H.t[n - 1])}`, W - 3, Hh - 1);
   }
@@ -411,7 +411,7 @@ ${slider(P3, 'luz', 'Intensidad de luz y vidrio', 0, 1, 0.05, FMT.luz)}${slider(
     if (b.dataset.vel !== undefined) { VIDA.vel = (VIDA.vel + 1) % VEL.length; b.textContent = '×' + VEL[VIDA.vel]; return; }
     if (b.dataset.sd) { ponerSemilla(VIDA.seed + +b.dataset.sd); return; }
     if (b.dataset.como !== undefined) { const c = $('[data-como-txt]'); c.hidden = !c.hidden; b.setAttribute('aria-expanded', String(!c.hidden)); return; }
-    if (b.dataset.eval !== undefined) { import('./vida_evaluar.js?v=1').then(m => m.abrirEvaluar({ PAR, esc: esc() === 'A' ? 'C' : esc(), verCorrida: (s, e) => ponerSemilla(s, e) })).catch(er => console.warn('evaluar:', er)); return; }
+    if (b.dataset.eval !== undefined) { import('./vida_evaluar.js?v=2').then(m => m.abrirEvaluar({ PAR, esc: esc() === 'A' ? 'C' : esc(), verCorrida: (s, e) => ponerSemilla(s, e) })).catch(er => console.warn('evaluar:', er)); return; }
     if (b.dataset.tab !== undefined) { const t = document.getElementById('b-tablero'); if (t) t.click(); return; }
     if (b.dataset.e) { const e = b.dataset.e; setTimeout(vistaGeneral, 250); if (e === 'A') { if (T3.escenario === 'proyecto') document.querySelector('.sw button[data-e="hoy"]')?.click(); }
       else { SIMST.esc = e; avisar('mapa'); if (T3.escenario !== 'proyecto') document.querySelector('.sw button[data-e="proyecto"]')?.click(); }
@@ -459,8 +459,8 @@ ${slider(P3, 'luz', 'Intensidad de luz y vidrio', 0, 1, 0.05, FMT.luz)}${slider(
   requestAnimationFrame(cuadro);
   aplicar();
   setTimeout(() => import('./guia.js?v=2').then(m => m.abrirGuia(false)).catch(() => {}), 2500); // la primera vez: cómo se usa
-  import('./mejora_tour.js?v=6').then(m => { T3.mejora = m.iniciarMejoraTour({ T3 }); }).catch(e => console.warn('recorrido:', e)); // «¿Cómo mejora Kennedy?»: antes y después en cada lugar
-  import('./capas_escenario.js?v=5').then(m => m.iniciarCapasEscenario({ T3 })).catch(e => console.warn('capas:', e)); // sintaxis, ruido, usos e indicadores cambian con la propuesta
+  import('./mejora_tour.js?v=7').then(m => { T3.mejora = m.iniciarMejoraTour({ T3 }); }).catch(e => console.warn('recorrido:', e)); // «¿Cómo mejora Kennedy?»: antes y después en cada lugar
+  import('./capas_escenario.js?v=6').then(m => m.iniciarCapasEscenario({ T3 })).catch(e => console.warn('capas:', e)); // sintaxis, ruido, usos e indicadores cambian con la propuesta
   // R = vista viva compatible (capas_escenario.js y mejora_tour.js la leen); vida = estado de la simulación sin fin (A, B, C con la semilla actual)
   return { aplicar, arrancar, parar, get R() { return RV; }, get vida() { return VIDA; }, semilla: (s, e) => ponerSemilla(s, e), get via() { return via; }, marcas, mO };
 }

@@ -3,9 +3,9 @@
    semillas FIJAS 1..30 de B, C y A (Kennedy hoy), 100 años cada una, con los parámetros congelados al pulsar y las MISMAS reglas de colapso.
    Muestra TODAS las corridas: supervivencia, mediana y rango de años hasta el colapso, causas, trayectorias tenues + mediana, y la lista
    completa de semillas (cada una se puede ver en el mapa). */
-import { REGLAS, EVENTOS, P_RECORTE, P_RESTAURA, ARRANQUE, AÑO, corrida, resumen } from './sim_vida.js?v=1';
+import { REGLAS, EVENTOS, P_RECORTE, P_RESTAURA, ARRANQUE, AÑO, corrida, resumen } from './sim_vida.js?v=2';
 const R_CORRIDAS = 30, AÑOS = 100;
-const COL = { A: '#8fb0c9', B: '#b07aa1', C: '#e2a55b' }, NOM = { A: 'Kennedy hoy', B: 'Nodo central', C: 'Clúster rotativo' };
+const COL = { A: '#8fb0c9', B: '#b07aa1', C: '#D5FF3F' }, NOM = { A: 'Kennedy hoy', B: 'Nodo central', C: 'Clúster rotativo' };
 const NREG = Object.fromEntries(REGLAS.map(R => [R.k, R.n.toLowerCase()]));
 const fmt = (v, d = 0) => (v == null || !isFinite(v)) ? '–' : v.toLocaleString('es-CO', { maximumFractionDigits: d, minimumFractionDigits: d });
 let el = null, RES = null, CLAVE = '', foco = 'C', trayEsc = 'C', trabajo = 0, cb = null;
@@ -21,7 +21,7 @@ const CSS = `
 #vev .sec{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06)}#vev h4{margin:0 0 6px;font:600 10px var(--ui-mono,ui-monospace,monospace);letter-spacing:.14em;text-transform:uppercase;color:#cfd5d9}
 #vev .decl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}#vev .decl div{padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.04);font-size:11.5px;color:#c3cace}#vev .decl b{display:block;color:#fff;font-size:13px;font-variant-numeric:tabular-nums}
 #vev details{margin-top:8px}#vev summary{cursor:pointer;color:#dfe4e6;font-weight:600;font-size:11.5px}#vev ol,#vev ul.ev{margin:6px 0 0;padding-left:18px;color:#c3cace;font-size:11.5px}#vev li{margin:2px 0}
-#vev .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}#vev .bar i{display:block;height:100%;width:0;background:#e2a55b;transition:width .2s}
+#vev .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}#vev .bar i{display:block;height:100%;width:0;background:#D5FF3F;transition:width .2s}
 #vev .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 #vev .card{padding:10px 11px;border-radius:11px;background:rgba(255,255,255,.04);border-top:3px solid var(--c)}#vev .card h5{margin:0 0 4px;font-size:12px;font-weight:600}
 #vev .card .big{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}#vev .card .big small{font-size:11px;font-weight:400;color:#949da3;margin-left:4px}
@@ -83,7 +83,7 @@ export function abrirEvaluar({ PAR, esc, verCorrida }) {
   const recibir = (d) => { if (d.id !== id) return; if (d.tipo === 'progreso') progreso(d.hecho, d.total);
     if (d.tipo === 'escenario') { RES[d.e] = { corridas: d.corridas, resumen: d.resumen }; pintar(); }
     if (d.tipo === 'fin') { RES.listo = true; el.querySelector('[data-prog]').textContent = `Listo: ${escs.length * R_CORRIDAS} corridas de ${AÑOS} años con los parámetros de este momento.`; pintar(); } };
-  let w = null; try { w = new Worker(new URL('./sim_vida_worker.js?v=1', import.meta.url), { type: 'module' }); } catch (e) { w = null; }
+  let w = null; try { w = new Worker(new URL('./sim_vida_worker.js?v=2', import.meta.url), { type: 'module' }); } catch (e) { w = null; }
   if (w) { w.onmessage = (ev) => { recibir(ev.data); if (ev.data.tipo === 'fin') w.terminate(); };
     w.onerror = () => { w.terminate(); porBloques(id, escs, congelado, recibir); }; w.postMessage({ id, escs, R: R_CORRIDAS, años: AÑOS, PAR: congelado }); }
   else porBloques(id, escs, congelado, recibir);

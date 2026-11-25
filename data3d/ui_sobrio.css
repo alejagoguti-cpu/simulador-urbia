@@ -3,7 +3,7 @@
    Se carga al final y manda sobre los estilos de cada módulo (por eso usa body y !important en lo esencial). */
 :root{
   --ui-bg:rgba(13,15,18,.74); --ui-bg2:rgba(255,255,255,.035); --ui-bd:rgba(255,255,255,.075); --ui-bd2:rgba(255,255,255,.13);
-  --ui-tx:#e9ebec; --ui-tx2:#9aa2a7; --ui-tx3:#646c71; --ui-acc:#e2a55b; --ui-acc-bg:rgba(226,165,91,.13); --ui-acc-tx:#f2c995;
+  --ui-tx:#e9ebec; --ui-tx2:#9aa2a7; --ui-tx3:#646c71; --ui-acc:#D5FF3F; --ui-acc-bg:rgba(213,255,63,.13); --ui-acc-tx:#e3ff86;
   --ui-sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --ui-mono:'JetBrains Mono',ui-monospace,monospace;
 }
 body .gs-pan, body #bt-pan, body #hid-red, body #cvMarca, body #cvMini, body #dock, body #usos-panel, body #ruido-panel, body #cierre-panel, body #toast, body #cvAyuda{
@@ -26,7 +26,7 @@ body .gs-pan button{
   transition:background .15s,color .15s,border-color .15s;
 }
 body .gs-pan button:hover{color:var(--ui-tx)!important; border-color:var(--ui-bd2)!important}
-body .gs-pan button.on{background:var(--ui-acc-bg)!important; color:var(--ui-acc-tx)!important; border-color:rgba(226,165,91,.42)!important}
+body .gs-pan button.on{background:var(--ui-acc-bg)!important; color:var(--ui-acc-tx)!important; border-color:rgba(213,255,63,.42)!important}
 body .gs-fila{gap:3px!important}
 /* reloj */
 body .gs-reloj b{font:300 30px var(--ui-sans)!important; letter-spacing:-.01em!important}
@@ -95,7 +95,7 @@ body .gs-pan h3{gap:10px}
 /* red biótica: interruptor, títulos y fichas de especies en el mismo lenguaje */
 body #bt-pan .bt-sub, body #bt-pan .bt-cat{font-family:var(--ui-mono)!important; font-weight:500!important; letter-spacing:.14em!important; color:var(--ui-tx3)!important}
 body #bt-pan .bt-sw{background:var(--ui-bg2)!important; color:var(--ui-tx2)!important; border:1px solid var(--ui-bd)!important; font:500 10.5px var(--ui-sans)!important; letter-spacing:.04em!important}
-body #bt-pan .bt-sw.on, body #bt-pan .bt-sw[aria-pressed=true]{background:var(--ui-acc-bg)!important; color:var(--ui-acc-tx)!important; border-color:rgba(226,165,91,.42)!important}
+body #bt-pan .bt-sw.on, body #bt-pan .bt-sw[aria-pressed=true]{background:var(--ui-acc-bg)!important; color:var(--ui-acc-tx)!important; border-color:rgba(213,255,63,.42)!important}
 body #bt-pan .bt-min{background:var(--ui-bg2)!important; color:var(--ui-tx3)!important}
 body #bt-pan .bt-tipo{font:400 12px var(--ui-sans)!important; color:var(--ui-tx)!important; border-radius:6px!important}
 body #bt-pan .bt-tipo:hover{background:rgba(255,255,255,.04)!important}

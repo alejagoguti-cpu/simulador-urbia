@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>urbia · Matriz de fuentes</title>
+<link rel="icon" href="urbia_icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090C;--pan:#0f1411;--pan2:#141b16;--bd:rgba(213,255,63,.12);--bd2:rgba(244,243,239,.08);--tx:#F4F3EF;--tx2:#b5bcb3;--tx3:#7d877e;--lima:#D5FF3F;--azul:#304FFE;
+  --t-oficial:#D5FF3F;--t-academica:#7ee0c0;--t-prensa:#f2c14e;--t-derivado:#8fb3ff;--t-diseno:#c9a7ff;--t-supuesto:#ff7a6b}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Manrope,system-ui,sans-serif}
+a{color:var(--lima)}
+header{display:flex;align-items:center;gap:18px;padding:16px 24px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:rgba(8,9,12,.92);backdrop-filter:blur(10px);z-index:5}
+header img.l{height:30px}header .sep{width:1px;height:30px;background:rgba(244,243,239,.25)}header img.j{height:34px}
+header h1{font-size:15px;margin:0;font-weight:700}header h1 small{display:block;font:500 10px 'JetBrains Mono',monospace;letter-spacing:.16em;color:var(--lima);text-transform:uppercase;margin-top:3px}
+header .sp{flex:1}header a.b{font:600 12px Manrope;color:#08090C;background:var(--lima);padding:8px 12px;border-radius:3px;text-decoration:none}
+main{padding:18px 24px 60px;max-width:1500px;margin:0 auto}
+.mono{font-family:'JetBrains Mono',monospace}
+.lbl{font:500 10px 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--tx3)}
+.slicers{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.slicers button{font:600 12px Manrope;color:var(--tx2);background:var(--pan);border:1px solid var(--bd2);border-radius:3px;padding:7px 11px;cursor:pointer}
+.slicers button.on{color:#08090C;background:var(--lima);border-color:var(--lima)}
+.slicers input{flex:1;min-width:200px;font:500 13px Manrope;color:var(--tx);background:var(--pan);border:1px solid var(--bd2);border-radius:3px;padding:8px 11px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--pan);border:1px solid var(--bd2);border-top:2px solid var(--c,var(--lima));padding:12px 14px;border-radius:3px}
+.kpi b{display:block;font-size:28px;font-weight:700;margin-top:6px;font-variant-numeric:tabular-nums}.kpi span{font-size:11px;color:var(--tx3)}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;margin-bottom:14px}
+.card{background:var(--pan);border:1px solid var(--bd2);border-radius:3px;padding:14px}
+.card h2{font-size:13px;margin:0 0 4px;font-weight:700}.card p.s{margin:0 0 12px;font-size:11.5px;color:var(--tx3)}
+table.hm{width:100%;border-collapse:collapse;font-size:12px}
+table.hm th{font:500 9.5px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);text-align:center;padding:6px 4px;font-weight:500}
+table.hm th:first-child{text-align:left}
+table.hm td{padding:3px;text-align:center}table.hm td:first-child{text-align:left;padding-right:10px;color:var(--tx2);white-space:nowrap;cursor:pointer}
+table.hm td:first-child:hover{color:var(--lima)}
+.cell{display:block;padding:7px 0;border-radius:2px;font:600 12px 'JetBrains Mono',monospace;cursor:pointer;transition:outline .1s}
+.cell:hover{outline:1px solid var(--tx)}
+.bars .r{display:grid;grid-template-columns:150px 1fr 44px;gap:8px;align-items:center;margin:6px 0;font-size:12px;color:var(--tx2)}
+.bars .t{display:flex;height:14px;border-radius:2px;overflow:hidden;background:var(--pan2)}
+.bars .t i{display:block;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--tx2);margin-top:10px}.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tw{overflow:auto;max-height:70vh;border:1px solid var(--bd2);border-radius:3px}
+table.dt{width:100%;border-collapse:collapse;font-size:12px;min-width:1100px}
+table.dt th{position:sticky;top:0;background:var(--pan2);font:500 9.5px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);text-align:left;padding:9px 10px;cursor:pointer;white-space:nowrap;z-index:1}
+table.dt td{padding:9px 10px;border-top:1px solid var(--bd2);vertical-align:top;color:var(--tx2)}
+table.dt tr:hover td{background:rgba(213,255,63,.03)}
+table.dt td.v{color:var(--tx);font:600 12.5px 'JetBrains Mono',monospace;white-space:nowrap;text-align:right}
+table.dt td.var{color:var(--tx);font-weight:600;min-width:200px}
+table.dt td.cita{font-size:11px;color:var(--tx3);font-style:italic;max-width:320px}
+table.dt td.uso{font:400 10.5px 'JetBrains Mono',monospace;color:var(--tx3);max-width:220px}
+.tag{display:inline-block;font:600 10px Manrope;padding:3px 7px;border-radius:2px;color:#08090C;white-space:nowrap}
+.nota{font-size:12px;color:var(--tx3);line-height:1.6;margin-top:16px;max-width:1000px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}main{padding:14px 16px}header{padding:12px 16px;flex-wrap:wrap}header img.j{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <img class="l" src="urbia_logo.svg" alt="urbia"><span class="sep"></span><img class="j" src="img_javeriana_claro.png" alt="Pontificia Universidad Javeriana">
+  <h1>Matriz de fuentes del simulador<small>Kennedy · Bavaria Común · de dónde sale cada cifra</small></h1>
+  <span class="sp"></span><a class="b" href="index.html">← Volver al simulador</a>
+</header>
+<main>
+  <div class="slicers" id="slSim"></div>
+  <div class="slicers" id="slTipo"></div>
+  <div class="slicers"><input id="q" placeholder="Buscar variable, fuente o valor (ej. Corabastos, toneladas, Doña Juana)…"></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="grid2">
+    <div class="card"><h2>Matriz simulador × tipo de fuente</h2><p class="s">Número de cifras. Clic en una celda filtra la tabla.</p><div id="hm"></div></div>
+    <div class="card"><h2>Respaldo de cada simulador</h2><p class="s">Proporción de cifras por tipo de fuente.</p><div class="bars" id="bars"></div><div class="leg" id="leg"></div></div>
+  </div>
+  <div class="card"><h2>Detalle de cifras <span class="mono" id="cnt" style="color:var(--tx3);font-weight:400;font-size:11px"></span></h2><p class="s">Cada fila es un valor que usa el simulador: la cifra, la fuente con su enlace, la frase que la respalda y el parámetro del código donde entra.</p>
+    <div class="tw"><table class="dt"><thead><tr>
+      <th data-k="sim">Simulador</th><th data-k="variable">Variable</th><th data-k="valor">Valor</th><th data-k="unidad">Unidad</th><th data-k="año">Año</th><th data-k="tipo">Tipo</th><th data-k="fuente">Fuente</th><th>Respaldo</th><th data-k="uso">Dónde entra</th>
+    </tr></thead><tbody id="tb"></tbody></table></div>
+  </div>
+  <p class="nota" id="nota"></p>
+</main>
+<script>
+const TIPOS = { oficial: ['Oficial', 'var(--t-oficial)'], academica: ['Académica', 'var(--t-academica)'], prensa: ['Prensa', 'var(--t-prensa)'], derivado: ['Calculado de fuentes', 'var(--t-derivado)'], diseno: ['Decisión de diseño', 'var(--t-diseno)'], supuesto: ['Supuesto plausible', 'var(--t-supuesto)'] };
+const ST = { sim: 'todos', tipo: 'todos', q: '', ord: null, dir: 1 };
+let D = null;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmtV = v => typeof v === 'number' ? v.toLocaleString('es-CO', { maximumFractionDigits: 3 }) : esc(v);
+const tag = t => `<span class="tag" style="background:${TIPOS[t][1]}">${TIPOS[t][0]}</span>`;
+function filas(ignorar) {
+  const q = ST.q.trim().toLowerCase();
+  return D.filas.filter(f => (ignorar === 'sim' || ST.sim === 'todos' || f.sim === ST.sim) && (ignorar === 'tipo' || ST.tipo === 'todos' || f.tipo === ST.tipo) &&
+    (!q || [f.variable, f.fuente, f.valor, f.unidad, f.cita, f.uso, f.sim].join(' ').toLowerCase().includes(q)));
+}
+function slicers() {
+  const b = (k, v, n) => `<button data-k="${k}" data-v="${v}" class="${ST[k] === v ? 'on' : ''}">${esc(n)}</button>`;
+  document.getElementById('slSim').innerHTML = '<span class="lbl" style="margin-right:6px">Simulador</span>' + b('sim', 'todos', 'Todos') + D.sims.map(s => b('sim', s.k, s.n)).join('');
+  document.getElementById('slTipo').innerHTML = '<span class="lbl" style="margin-right:6px">Tipo de fuente</span>' + b('tipo', 'todos', 'Todos') + Object.entries(TIPOS).map(([k, [n]]) => b('tipo', k, n)).join('');
+}
+function pintar() {
+  slicers(); const F = filas();
+  const n = F.length, c = t => F.filter(f => f.tipo === t).length, pct = x => n ? Math.round(x / n * 100) + ' %' : '–';
+  const real = c('oficial') + c('academica') + c('prensa');
+  document.getElementById('kpis').innerHTML = [
+    ['Cifras', n, 'en el filtro actual', 'var(--tx)'], ['Con fuente publicada', pct(real), real + ' oficiales, académicas o de prensa', 'var(--t-oficial)'],
+    ['Oficiales', c('oficial'), 'DANE, SDP, SDA, UAESP, SDM, Corabastos…', 'var(--t-oficial)'], ['Calculadas', c('derivado'), 'operaciones sobre cifras con fuente', 'var(--t-derivado)'],
+    ['Decisiones de diseño', c('diseno'), 'lo que propone el proyecto', 'var(--t-diseno)'], ['Supuestos', c('supuesto'), 'acotados con referencias', 'var(--t-supuesto)']
+  ].map(([l, v, s, col]) => `<div class="kpi" style="--c:${col}"><div class="lbl">${l}</div><b>${v}</b><span>${s}</span></div>`).join('');
+  // matriz
+  const G = filas('sim'), T = Object.keys(TIPOS), mx = Math.max(1, ...D.sims.flatMap(s => T.map(t => G.filter(f => f.sim === s.k && f.tipo === t).length)));
+  document.getElementById('hm').innerHTML = `<table class="hm"><tr><th>Simulador</th>${T.map(t => `<th>${TIPOS[t][0]}</th>`).join('')}<th>Total</th></tr>` +
+    D.sims.map(s => { const fs = G.filter(f => f.sim === s.k); return `<tr><td data-sim="${s.k}">${esc(s.n)}</td>${T.map(t => { const k = fs.filter(f => f.tipo === t).length, a = k ? 0.18 + 0.82 * k / mx : 0;
+      return `<td><span class="cell" data-sim="${s.k}" data-tipo="${t}" style="background:color-mix(in srgb, ${TIPOS[t][1]} ${Math.round(a * 100)}%, #141b16);color:${a > .55 ? '#08090C' : 'var(--tx2)'}">${k || '·'}</span></td>`; }).join('')}<td class="mono" style="color:var(--tx)">${fs.length}</td></tr>`; }).join('') + '</table>';
+  document.getElementById('bars').innerHTML = D.sims.map(s => { const fs = G.filter(f => f.sim === s.k), m = fs.length || 1, r = Math.round((fs.filter(f => ['oficial', 'academica', 'prensa', 'derivado'].includes(f.tipo)).length) / m * 100);
+    return `<div class="r"><span>${esc(s.n)}</span><div class="t">${T.map(t => `<i title="${TIPOS[t][0]}: ${fs.filter(f => f.tipo === t).length}" style="width:${fs.filter(f => f.tipo === t).length / m * 100}%;background:${TIPOS[t][1]}"></i>`).join('')}</div><span class="mono" title="con fuente o calculado">${fs.length ? r + '%' : '–'}</span></div>`; }).join('');
+  document.getElementById('leg').innerHTML = T.map(t => `<span><i style="background:${TIPOS[t][1]}"></i>${TIPOS[t][0]}</span>`).join('');
+  // tabla
+  let R = F.slice(); if (ST.ord) R.sort((a, b) => (String(a[ST.ord]).localeCompare(String(b[ST.ord]), 'es', { numeric: true })) * ST.dir);
+  const simN = Object.fromEntries(D.sims.map(s => [s.k, s.n]));
+  document.getElementById('cnt').textContent = `· ${R.length} filas`;
+  document.getElementById('tb').innerHTML = R.map(f => `<tr><td>${esc(simN[f.sim] || f.sim)}</td><td class="var">${esc(f.variable)}</td><td class="v">${fmtV(f.valor)}</td><td>${esc(f.unidad)}</td><td class="mono">${esc(f.año)}</td><td>${tag(f.tipo)}</td>
+    <td>${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.fuente)}</a>` : esc(f.fuente)}</td><td class="cita">${esc(f.cita)}</td><td class="uso">${esc(f.uso)}</td></tr>`).join('');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.slicers button'); if (b) { ST[b.dataset.k] = ST[b.dataset.k] === b.dataset.v && b.dataset.v !== 'todos' ? 'todos' : b.dataset.v; pintar(); return; }
+  const c = e.target.closest('[data-sim]'); if (c) { ST.sim = c.dataset.sim; ST.tipo = c.dataset.tipo || 'todos'; pintar(); document.querySelector('.tw').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  const h = e.target.closest('th[data-k]'); if (h) { ST.dir = ST.ord === h.dataset.k ? -ST.dir : 1; ST.ord = h.dataset.k; pintar(); }
+});
+document.getElementById('q').addEventListener('input', e => { ST.q = e.target.value; pintar(); });
+fetch('data3d/fuentes.json?v=' + Date.now()).then(r => r.json()).then(j => { D = j; document.getElementById('nota').innerHTML = j.nota || ''; pintar(); });
+</script>
+</body>
+</html>

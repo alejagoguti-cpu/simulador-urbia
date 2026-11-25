@@ -2,12 +2,14 @@
    Compartidos por el tablero (data3d/simulaciones.js) y el panel de escenarios sobre el mapa (data3d/escenarios_sim.js):
    los dos leen y cambian los MISMOS parámetros (PAR) y el mismo estado (SIMST: escenario y semana), y se avisan con el evento
    'sim-cambio' (detail.origen = quién cambió). Los valores que no da el documento están marcados [SUP]. */
-export const SEM = 520, AÑO = 52, POB_K = 1034000; // 10 años; población de Kennedy (proyección DANE 2024, aprox.)
+// CIFRAS CON FUENTE (ver fuentes.html / data3d/fuentes.json): POB_K = ASIS Kennedy 2024 (DANE); ORG_PC = 1,1 kg/hab/día (PPC RAS, Superservicios 2023) × 50 % orgánico (UAESP 2026);
+// DIST_DJ = 16,6 km Corabastos–Doña Juana (ruta OSRM); T_COMPAC = 11,5 t por compactador; REND_COMP = 0,23 kg compost/kg (4 plazas distritales, 2016); RIQ_BURRO = 49 especies (OAB-SDA 2021-22); CRECE = 0,4 %/año (ASIS 2024-2030)
+export const SEM = 520, AÑO = 52, POB_K = 1037929, ORG_PC = 0.55, DIST_DJ = 16.6, T_COMPAC = 11500, REND_COMP = 0.23, RIQ_BURRO = 49, CRECE = 1.004;
 export const PAR = {
   P1: { rend: 6, alcance: 0.5, auto: 0.35, merma: 0.1, precio: 2600, acopio: 15000, reac: 0.5, cupos: 12, retardo: 12, c: 1000, rotacion: 12, mu: 6, zona: 50000, sup: 98000, regional: 0.45,
     pares: 3, // [SUP] promotores que forman los propios hogares en C, por cada 10.000 hogares por semana (solo lo usa la simulación sin fin, data3d/sim_vida.js)
     sequia: false, bloqueo: false, crece: false, baldios: false },
-  P2: { frac: 0.4, cap: 6000, mad: 10, sust: 0.2, dist: 1.5 },
+  P2: { frac: 0.4, cap: 6000, mad: 17, /* 4 meses de maduración (fuente en fuentes.json) */ sust: 0.2, dist: 1.5 },
   P3: { disp: 400, borde: 20, arboles: 0.4, luz: 0.5, anti: true, rec: 0.02 }
 };
 // escenario de la propuesta (B o C; «Kennedy hoy» es A) y semana que se mira. En el mapa la simulación ya no termina (data3d/sim_vida.js):
@@ -22,7 +24,7 @@ export function sim01(e, P) {
   const out = { prod: [], auto: [], merma: [], exc: [], pers: [], pct: [], dep: [], act: [], m2p: [], cal: [], prom: [], espera: [], pc: [], carga: [], retiro: [], N };
   let A_ = e === 'A' ? 120 : 60, prom = e === 'A' ? 0 : 6, cola = 0, pob = POB_K, Nef = N; const pipeline = [];
   for (let t = 0; t < SEM; t++) {
-    if (P.crece && e !== 'A') pob *= Math.pow(1.015, 1 / AÑO);
+    if (P.crece && e !== 'A') pob *= Math.pow(CRECE, 1 / AÑO);
     if (P.baldios && e !== 'A' && t === 300) { Nef = N * 0.65; A_ *= 0.7; } // revocación de baldíos
     const clima = P.sequia && t >= 150 && t < 200 ? 0.55 : 1, bloqueo = P.bloqueo && t >= 260 && t < 290;
     if (e !== 'A') { if (t % 13 === 0) pipeline.push(t + P.retardo); while (pipeline.length && pipeline[0] <= t) { pipeline.shift(); prom += P.cupos; } } // promotores formados por Bavaria
@@ -55,16 +57,16 @@ export function sim01(e, P) {
 }
 /* ---------------- SIM-02 · orgánicos y compostaje ---------------- */
 export function sim02(e, P, pobZona) {
-  const gen = pobZona * 0.45 * 7, out = { relleno: [], compost: [], hongos: [], vuelve: [], pct: [], km: [], pila: [], desv: [], ocup: [], gen }; // 0,45 kg/día por persona [SUP]
-  const cap = e === 'A' ? 0 : e === 'B' ? P.cap : P.cap * 3.5, frac = e === 'A' ? 0.02 : P.frac, dist = e === 'A' ? 28 : e === 'B' ? P.dist : 4.5; // Doña Juana ~28 km; Bavaria ~4,5 km [SUP]
+  const gen = pobZona * ORG_PC * 7, out = { relleno: [], compost: [], hongos: [], vuelve: [], pct: [], km: [], pila: [], desv: [], ocup: [], gen }; // ORG_PC kg/día por persona (calculado de fuentes)
+  const cap = e === 'A' ? 0 : e === 'B' ? P.cap : P.cap * 3.5, frac = e === 'A' ? 0.02 : P.frac, dist = e === 'A' ? DIST_DJ : e === 'B' ? P.dist : 4.5; // Doña Juana 16,6 km por vía (OSRM); Bavaria ~4,5 km medido en el mapa
   const entra = []; let pila = 0;
   for (let t = 0; t < SEM; t++) {
     const adopc = Math.min(1, 0.15 + t / 156); // la separación en la fuente se aprende en ~3 años [SUP]
     const desv = Math.min(gen * frac * adopc, cap || gen * frac * adopc * (e === 'A' ? 1 : 0)), rell = gen - desv;           // G8
     entra.push(desv); pila += desv; const madura = t >= P.mad ? entra[t - P.mad] : 0; pila -= madura;                         // G9
-    const sust = e === 'C' ? madura * P.sust : e === 'B' ? madura * P.sust * 0.3 : 0, comp = madura * 0.5 - sust * 0.5, hongos = sust * 0.15; // G11
-    out.relleno.push(rell); out.compost.push(Math.max(0, comp)); out.hongos.push(hongos); out.vuelve.push(Math.max(0, comp)); out.pct.push(Math.max(0, comp) / gen * 100 * 2); out.pila.push(pila);
-    out.km.push(rell / 8000 * 28 * 2 + desv / 1500 * dist * 2); out.desv.push(desv); out.ocup.push(cap ? Math.min(1.5, pila / (cap * Math.max(1, P.mad) / 4)) : 0); // G12
+    const sust = e === 'C' ? madura * P.sust : e === 'B' ? madura * P.sust * 0.3 : 0, comp = (madura - sust) * REND_COMP, hongos = sust * 0.15; // G11
+    out.relleno.push(rell); out.compost.push(Math.max(0, comp)); out.hongos.push(hongos); out.vuelve.push(Math.max(0, comp)); out.pct.push(Math.max(0, comp) / REND_COMP / gen * 100); out.pila.push(pila);
+    out.km.push(rell / T_COMPAC * DIST_DJ * 2 + desv / 1500 * dist * 2); out.desv.push(desv); out.ocup.push(cap ? Math.min(1.5, pila / (cap * Math.max(1, P.mad) / 4)) : 0); // G12
   }
   return out;
 }
@@ -80,7 +82,7 @@ export function sim03(e, P, anti) {
     const K = 900 * (0.6 + 0.6 * W + 0.5 * P.arboles + (e === 'A' ? 0 : 0.4 * conect + huertas * 0.006));
     const m = (e === 'A' ? 0.0004 : huertas / 40 * 0.004 * P.luz * (e === 'B' ? 1 : 0.6)) * (anti ? 0.3 : 1);                // G16 trampa: luz y vidrio
     const r = 0.012; const crece = r * B * (1 - B / K), muere = B * m; muertes += muere; B = Math.max(20, B + crece - muere + conect * 1.5); // G13
-    out.aves.push(B); out.riq.push(Math.round(42 * (0.45 + 0.35 * conect + 0.3 * W))); out.hum.push(W * 100); out.trampa.push(muertes);
+    out.aves.push(B); out.riq.push(Math.round(RIQ_BURRO * (0.45 + 0.35 * conect + 0.3 * W))); out.hum.push(W * 100); out.trampa.push(muertes);
   }
   return out;
 }

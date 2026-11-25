@@ -1,0 +1,18 @@
+/* ============ MARCA URBIA · se carga después de ui_sobrio.css y manda sobre ella ============
+   Negro verdoso translúcido, Manrope + JetBrains Mono, acento lima #D5FF3F (brandbook urbia). */
+:root{
+  --ui-bg:rgba(9,14,11,.78); --ui-bg2:rgba(213,255,63,.035); --ui-bd:rgba(213,255,63,.12); --ui-bd2:rgba(213,255,63,.32);
+  --ui-tx:#F4F3EF; --ui-tx2:#b5bcb3; --ui-tx3:#7d877e; --ui-acc:#D5FF3F; --ui-acc-bg:rgba(213,255,63,.12); --ui-acc-tx:#e3ff86;
+  --ui-sans:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+body{font-family:'Manrope',system-ui,sans-serif}
+body .gs-pan button.on{border-color:rgba(213,255,63,.5)!important}
+body #cvMarca{padding:10px 16px!important;gap:14px!important;border-radius:4px!important;border-color:rgba(213,255,63,.22)!important;background:rgba(9,14,11,.8)!important}
+#cvMarca .u-logo{height:26px;width:auto;display:block}
+#cvMarca .u-sep{width:1px;height:28px;background:rgba(244,243,239,.25)}
+#cvMarca .u-jav{height:30px;width:auto;display:block}
+#cvMarca .u-txt b{font:700 12px 'Manrope',sans-serif!important;letter-spacing:.02em;color:#F4F3EF}
+#cvMarca .u-txt small{font:500 9.5px 'JetBrains Mono',monospace!important;letter-spacing:.16em;text-transform:uppercase;color:#D5FF3F!important}
+.u-fuentes-btn{position:fixed;left:14px;bottom:30px;z-index:30;font:600 11px 'Manrope',sans-serif;letter-spacing:.04em;color:#08090C;background:#D5FF3F;border:0;border-radius:3px;padding:8px 12px;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.u-fuentes-btn:hover{background:#e6ff8a}
+@media(max-width:760px){#cvMarca .u-txt{display:none} .u-fuentes-btn{bottom:auto;top:70px}}

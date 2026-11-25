@@ -26,7 +26,7 @@ const P = {
   costoKm: 0.05,            // [SUP] costo relativo de transporte por km
   elast: 0.35,              // [SUP] cuánto baja Corabastos el precio por volumen perdido
   aprende: 0.2,             // [SUP] velocidad de ajuste de la confianza
-  kgCamion: 2000, kgFurgon: 600, kgBici: 80
+  kgCamion: 4640, /* 6.962 t/día ÷ 1.500 vehículos de carga/día (Agronegocios 2024, gerencia Corabastos) */ kgFurgon: 600, kgBici: 80
 };
 const CLIMA = { normal: 1, lluvia: 0.8, sequia: 0.55 }; // [SUP] rendimiento de las huertas
 const ESCENARIOS = {

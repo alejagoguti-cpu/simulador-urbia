@@ -3,12 +3,12 @@
    para ver el antes y el después en el mismo sitio. La tarjeta dice el número de hoy y el de la propuesta (año 10 de la simulación),
    qué mirar en el mapa y por qué mejora. Los números salen del mismo modelo del tablero (data3d/sim_modelos.js) y del
    panel de escenarios (window.KEN_ESIM). Se puede pasar de hoy a propuesta a mano y repetir el cambio. */
-import { SEM, SIMST } from './sim_modelos.js?v=3';
+import { SEM, SIMST } from './sim_modelos.js?v=4';
 export function iniciarMejoraTour({ T3 }) {
   const THREE = T3.THREE, MOV = innerWidth < 760, RMQ = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fmt = (v, d = 0) => (v == null || !isFinite(v)) ? '–' : v.toLocaleString('es-CO', { maximumFractionDigits: d, minimumFractionDigits: d });
   const fmtK = (v) => v >= 1e4 ? fmt(v / 1e3, 0) + ' mil' : fmt(v);
-  const CHOY = '#8fb0c9', CPRO = '#e2a55b', NE = { B: 'Nodo central', C: 'Clúster rotativo' };
+  const CHOY = '#8fb0c9', CPRO = '#D5FF3F', NE = { B: 'Nodo central', C: 'Clúster rotativo' };
   const BURRO = [2095.67, -109.06], CORA = [1132.1, 948.6], BAV = [3966, 49]; // BAV: centro del predio (data3d/bavaria.json)
   const BAVC = () => (window.KEN_BAV && window.KEN_BAV.compost) || [4185.7, 28.9];
   const MID = () => (T3.alivio && T3.alivio.mid) || [1700, 400];
@@ -39,7 +39,7 @@ export function iniciarMejoraTour({ T3 }) {
       mira: () => { const K = window.KEN_PARCHES; return `Aparecen ${K ? `<b>${K.parches} parches con ${fmt(K.n)} árboles nativos</b>` : 'parches de árboles nativos'} en los parques y junto a las huertas: <b style="color:#f2c230">caucho sabanero, aliso, sauco, chicalá, arrayán</b> y arbustos de flor (chilco, tíbar, raque, mortiño). Llegan colibríes, copetones y mirlas, y las <b>líneas de colores de las relaciones bióticas</b> aparecen lejos del agua.`; },
       por: 'Cada especie se escogió porque alimenta o da refugio a muchas especies de fauna (el caucho sabanero a 13, el sauco a 10, el aliso a 8); el sauce no, porque casi solo da sombra. Los parches cercanos funcionan como corredores entre los humedales.' },
     { tag: 'Residuos', t: 'Los residuos orgánicos vuelven a la tierra', lugar: BAVC, alto: 520,
-      hoy: (n) => [fmt(n.relA, 0) + ' t', 'por semana se van en camión al relleno Doña Juana (28 km)'], pro: (n) => [fmt(n.abP, 0) + ' t', `de abono al año para las huertas · al relleno ${fmt(n.relP, 0)} t/semana`],
+      hoy: (n) => [fmt(n.relA, 0) + ' t', 'por semana se van en camión al relleno Doña Juana (16,6 km por vía)'], pro: (n) => [fmt(n.abP, 0) + ' t', `de abono al año para las huertas · al relleno ${fmt(n.relP, 0)} t/semana`],
       mira: 'Aparece la planta de compost de Bavaria (círculo café): ahí llegan los orgánicos del barrio y salen abono y hongos.',
       por: 'Compostar cerca evita viajes de camión de 56 km ida y vuelta y devuelve nutrientes a las huertas.' },
     { tag: 'Humedal', t: 'Más aves en el Humedal El Burro', lugar: () => BURRO, alto: 820,
@@ -63,16 +63,16 @@ export function iniciarMejoraTour({ T3 }) {
 
   /* ---------- estilos ---------- */
   const css = document.createElement('style'); css.textContent = `
-#mt-btn{all:unset;cursor:pointer;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px 0 12px;border-radius:12px;background:#e2a55b;color:#1a1208;font:600 13px var(--ui-sans,Inter,system-ui,sans-serif);white-space:nowrap;box-shadow:0 6px 18px rgba(226,165,91,.3)}
+#mt-btn{all:unset;cursor:pointer;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px 0 12px;border-radius:12px;background:#D5FF3F;color:#1a1208;font:600 13px var(--ui-sans,Inter,system-ui,sans-serif);white-space:nowrap;box-shadow:0 6px 18px rgba(213,255,63,.3)}
 #mt-btn:hover{background:#ecb672}#mt-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}#mt-btn svg{flex:none}
-#esim .mt-ir{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 12px 8px;width:calc(100% - 24px);height:36px;border-radius:10px;background:#e2a55b;color:#1a1208;font:600 12.5px var(--ui-sans,Inter,system-ui,sans-serif)}
+#esim .mt-ir{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 12px 8px;width:calc(100% - 24px);height:36px;border-radius:10px;background:#D5FF3F;color:#1a1208;font:600 12.5px var(--ui-sans,Inter,system-ui,sans-serif)}
 #esim .mt-ir:hover{background:#ecb672}
 body.mt-on #esim,body.mt-on #tb,body.mt-on #ci-toast,body.mt-on #gs-izq,body.mt-on #bt-pan{display:none!important}
 #mt{position:fixed;z-index:40;left:50%;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 76px);transform:translateX(-50%);width:min(620px,calc(100vw - 24px));max-height:calc(100vh - 170px);overflow:auto;display:none;
   padding:16px 18px 14px;border-radius:18px;color:#eef1f2;font:400 12.5px/1.5 var(--ui-sans,Inter,system-ui,sans-serif);background:rgba(14,16,20,.86);border:1px solid rgba(255,255,255,.14);
   box-shadow:0 24px 50px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6)}
 body.mt-on #mt{display:block}
-#mt .tp{display:flex;align-items:center;gap:10px;margin:0 0 2px;font:600 10px var(--ui-mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:#f2c995}
+#mt .tp{display:flex;align-items:center;gap:10px;margin:0 0 2px;font:600 10px var(--ui-mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:#e3ff86}
 #mt .tp span{flex:1}#mt .x{all:unset;cursor:pointer;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;color:#b3bbc0;font-size:18px}#mt .x:hover{background:rgba(255,255,255,.08);color:#fff}
 #mt h3{margin:0 0 12px;font:600 19px/1.25 var(--ui-sans,Inter,system-ui,sans-serif);color:#fff}
 #mt .vs{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);align-items:stretch;gap:0;margin:0 0 12px}
@@ -82,7 +82,7 @@ body.mt-on #mt{display:block}
 #mt .cj small{display:flex;align-items:center;gap:6px;font:600 9.5px var(--ui-mono,monospace);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}#mt .cj small i{width:8px;height:8px;border-radius:2px;background:var(--c)}
 #mt .cj b{display:block;margin:4px 0 2px;font:300 30px/1.05 var(--ui-sans,Inter,system-ui,sans-serif);color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 #mt .cj span{display:block;font-size:11px;line-height:1.35;color:#c3cace}
-#mt .fl{display:grid;place-items:center;color:#f2c995;font-size:18px}
+#mt .fl{display:grid;place-items:center;color:#e3ff86;font-size:18px}
 #mt .ahora{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:11.5px;color:#d5dadd}#mt .ahora i{width:9px;height:9px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 30%,transparent)}
 #mt .ahora b{color:#fff}#mt .ahora em{font-style:normal;color:#949da3;margin-left:auto}
 #mt .tx{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;margin:0 0 12px;font-size:12px;line-height:1.5;color:#d5dadd}
@@ -92,9 +92,9 @@ body.mt-on #mt{display:block}
 #mt .res div b{text-align:right;font-weight:500;color:${CHOY};font-variant-numeric:tabular-nums}#mt .res div strong{text-align:right;color:${CPRO};font-variant-numeric:tabular-nums}#mt .res div i{color:#949da3;font-style:normal;text-align:center}
 #mt .nav{display:flex;align-items:center;gap:8px}
 #mt .nav button{all:unset;cursor:pointer;box-sizing:border-box;height:34px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e9ecee;font:500 12px var(--ui-sans,Inter,system-ui,sans-serif)}
-#mt .nav button:hover{background:rgba(255,255,255,.1)}#mt .nav button:focus-visible{outline:2px solid #fff}#mt .nav button.pri{background:#e2a55b;border-color:#e2a55b;color:#1a1208;font-weight:600}
+#mt .nav button:hover{background:rgba(255,255,255,.1)}#mt .nav button:focus-visible{outline:2px solid #fff}#mt .nav button.pri{background:#D5FF3F;border-color:#D5FF3F;color:#1a1208;font-weight:600}
 #mt .nav button[disabled]{opacity:.35;cursor:default}
-#mt .pts{flex:1;display:flex;justify-content:center;gap:5px}#mt .pts i{width:18px;height:4px;border-radius:2px;background:rgba(255,255,255,.15)}#mt .pts i.on{background:#e2a55b}
+#mt .pts{flex:1;display:flex;justify-content:center;gap:5px}#mt .pts i{width:18px;height:4px;border-radius:2px;background:rgba(255,255,255,.15)}#mt .pts i.on{background:#D5FF3F}
 @media(max-width:760px){#mt{bottom:calc(max(8px,env(safe-area-inset-bottom)) + 66px);padding:12px 12px 10px;max-height:58vh}#mt h3{font-size:16px;margin-bottom:8px}#mt .cj{padding:8px}#mt .cj b{font-size:22px}#mt .vs{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)}
   #mt .tx{grid-template-columns:1fr;gap:2px}#mt .tx dt{padding-top:4px}#mt .nav button{padding:0 10px}#mt .pts i{width:10px}#mt-btn{height:34px;font-size:12px}
   #mt .res div{grid-template-columns:minmax(0,1fr) 62px 12px 62px;font-size:11px}}
